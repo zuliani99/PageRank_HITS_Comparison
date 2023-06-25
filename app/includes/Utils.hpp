@@ -6,8 +6,36 @@
 #include <iostream>
 #include <filesystem>
 #include <vector>
+#include <algorithm>
+#include <numeric>
 
 typedef std::pair<unsigned int, unsigned int> nodes_pair;
+
+
+bool compareByFirst(const nodes_pair& pair1, const nodes_pair& pair2) {
+    return pair1.first < pair2.first;
+}
+
+bool compareBySecond(const nodes_pair& pair1, const nodes_pair& pair2) {
+    return pair1.second < pair2.second;
+}
+
+
+bool compare(const int& a, const int& b) {
+    return a < b;
+}
+
+std::vector<int> argsort(const std::vector<int>& input) {
+    std::vector<int> indices(input.size());
+    std::iota(indices.begin(), indices.end(), 0);
+
+    std::sort(indices.begin(), indices.end(), [&](int a, int b) {
+        return input[a] < input[b];
+    });
+
+    return indices;
+}
+
 
 // Fucntion that return the std::vector of dataset contained in the given directory path
 std::vector<std::string> getDatasetsTXT(const std::string& directoryPath) {

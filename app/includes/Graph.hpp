@@ -3,16 +3,15 @@
 #include <limits.h>
 #include "./Utils.hpp"
 
-// Read only one time the total txt? And pass the memory location to HITS and PageRank?
 
 class Graph {
 	public:
+		Graph() { };
 		Graph(std::string ds_path) {
 			this->set_nodes_edges(ds_path);
 			this->allocate_memory();
 		}
 
-	private:
 		std::string ds_path;
 		int nodes;
 		int edges;
@@ -20,6 +19,9 @@ class Graph {
 		int max_node = 0;
 		nodes_pair* np_pointer;
 
+		void freeMemory();
+
+	private:
 		void set_nodes_edges(const std::string& ds_path);
 		void allocate_memory();
 		std::vector<int> parseLine(const std::string& line);
@@ -86,12 +88,17 @@ void Graph::allocate_memory() {
     
     while (std::getline(file, line)) {
         if (line[0] != '#') {
-            std::vector<int> pair = parseLine(line);
-            updateMinMaxNodes(pair);
+            std::vector<int> pair = this->parseLine(line);
+            this->updateMinMaxNodes(pair);
             
             this->np_pointer[i] = nodes_pair(pair[0], pair[1]);
             i++;
         }
     }
     file.close();
+}
+
+void Graph::freeMemory() {
+	if (munmap(this->np_pointer, this->edges) != 0)
+    	throw std::runtime_error("Free memory failed\n");
 }
