@@ -1,8 +1,13 @@
+#ifndef _UG_H
+#define _UG_H
+
 #include <fstream>
 #include <string>
 #include <iostream>
 #include <filesystem>
 #include <vector>
+
+typedef std::pair<unsigned int, unsigned int> nodes_pair;
 
 // Fucntion that return the std::vector of dataset contained in the given directory path
 std::vector<std::string> getDatasetsTXT(const std::string& directoryPath) {
@@ -25,3 +30,6 @@ std::ifstream readDataset(const std::string& filepath) {
     }
     return file;
 }
+
+
+#endif

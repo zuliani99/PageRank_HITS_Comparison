@@ -1,4 +1,6 @@
 #include <string>
+#include <sys/mman.h>
+#include <limits.h>
 #include "./Utils.hpp"
 
 // Read only one time the total txt? And pass the memory location to HITS and PageRank?
@@ -12,21 +14,84 @@ class Graph {
 
 	private:
 		std::string ds_path;
-		unsigned int nodes;
-		unsigned int edges;
-		unsigned int min_node;
-		unsigned int max_node;
+		int nodes;
+		int edges;
+		int min_node = INT_MAX;
+		int max_node = 0;
+		nodes_pair* np_pointer;
 
-		void set_nodes_edges(std::string ds_path);
+		void set_nodes_edges(const std::string& ds_path);
 		void allocate_memory();
+		std::vector<int> parseLine(const std::string& line);
+		void updateMinMaxNodes(const std::vector<int>& pair);
 };
 
-void Graph::set_nodes_edges(std::string ds_path) { // Read the file and get the number of nodes and edges from the description
+void Graph::set_nodes_edges(const std::string& ds_path) { // Read the file and get the number of nodes and edges from the description
 	this->ds_path = ds_path;
-	std::ifstream strem = readDataset(this->ds_path);
+	std::ifstream file = readDataset(this->ds_path);
+	std::string line;
+    for (int i = 0; i < 2; ++i) std::getline(file, line);
+	
+	// Read the third line of the description
+	std::getline(file, line);
+	file.close();
 
+	std::istringstream line_stream(line);
+    std::string str;
+	
+	// Extract the number of nodes and edges
+	while (line_stream >> str) {
+        if (str == "Nodes:") 
+            line_stream >> this->nodes;
+        else if (str == "Edges:")
+            line_stream >> this->edges;
+    }
 }
 
-void Graph::allocate_memory() { // we read the txt file and store the pair + set the min and mad node at the same time
-	std::ifstream strem = readDataset(this->ds_path);
+
+std::vector<int> Graph::parseLine(const std::string& line) {
+    std::istringstream line_stream(line);
+    std::string str;
+    std::vector<int> pair;
+    
+    while (std::getline(line_stream, str, '\t')) {
+        pair.push_back(std::stoi(str));
+    }
+    
+    return pair;
+}
+
+
+void Graph::updateMinMaxNodes(const std::vector<int>& pair) {
+    if (pair[0] < this->min_node)
+        this->min_node = pair[0];
+    if (pair[0] > this->max_node)
+        this->max_node = pair[0];
+    
+    if (pair[1] < this->min_node)
+        this->min_node = pair[1];
+    if (pair[1] > this->max_node)
+        this->max_node = pair[1];
+}
+
+
+void Graph::allocate_memory() {
+    this->np_pointer = (nodes_pair*)mmap(NULL, this->edges * sizeof(nodes_pair), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
+    if (this->np_pointer == MAP_FAILED)
+        throw std::runtime_error("Mapping Failed\n");
+    
+    std::ifstream file = readDataset(this->ds_path);
+    std::string line;
+    int i = 0;
+    
+    while (std::getline(file, line)) {
+        if (line[0] != '#') {
+            std::vector<int> pair = parseLine(line);
+            updateMinMaxNodes(pair);
+            
+            this->np_pointer[i] = nodes_pair(pair[0], pair[1]);
+            i++;
+        }
+    }
+    file.close();
 }
