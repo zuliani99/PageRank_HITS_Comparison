@@ -21,8 +21,8 @@ bool compareBySecond(const nodes_pair& pair1, const nodes_pair& pair2) {
 }
 
 
-bool compare(const int& a, const int& b) {
-    return a < b;
+bool compare(const int& a, const int& b, const std::vector<int>& values) {
+    return values[a] > values[b];
 }
 
 std::vector<int> argsort(const std::vector<int>& input) {
@@ -30,11 +30,12 @@ std::vector<int> argsort(const std::vector<int>& input) {
     std::iota(indices.begin(), indices.end(), 0);
 
     std::sort(indices.begin(), indices.end(), [&](int a, int b) {
-        return input[a] < input[b];
+        return compare(a, b, input);
     });
 
     return indices;
 }
+
 
 
 // Fucntion that return the std::vector of dataset contained in the given directory path

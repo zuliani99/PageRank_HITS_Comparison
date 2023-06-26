@@ -5,8 +5,9 @@
 //#include "../includes/PageRank.hpp"
 
 int main(){
-	std::vector<std::string> datasets = getDatasetsTXT("../dataset");
-	std::vector<int> top_k = {10, 20, 30, 40, 50};
+	//std::vector<std::string> datasets = getDatasetsTXT("../dataset");
+	std::vector<std::string> datasets = {"../dataset/web-Stanford.txt"};
+	std::vector<int> top_k = {10};//, 20, 30, 40, 50};
 
 	for (auto ds : datasets) {
 		std::cout << "-------------------" << ds << "---------------------" << std::endl;
