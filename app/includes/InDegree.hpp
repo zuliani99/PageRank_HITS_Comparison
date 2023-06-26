@@ -1,5 +1,4 @@
 #include "Graph.hpp"
-#include <algorithm>
 
 class InDegree {
 	public: 
@@ -16,13 +15,14 @@ class InDegree {
 		std::vector<int> top_k;
 		std::vector<std::pair<int, std::vector<std::pair<int, int>>>> top_k_results;
 		std::vector<int> In_Deg_Prestige;
-		int steps = 0;
+		int steps = this->graph.edges;
 		void compute();
 		void get_topk_results();
 		void print_topk_results();
 
 		
 	private:
+
 		Graph graph;
 };
 

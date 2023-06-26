@@ -1,8 +1,6 @@
-#include <iostream>
-#include "../includes/Utils.hpp"
 #include "../includes/InDegree.hpp"
+#include "../includes/PageRank.hpp"
 //#include "../includes/HITS.hpp"
-//#include "../includes/PageRank.hpp"
 
 int main(){
 	//std::vector<std::string> datasets = getDatasetsTXT("../dataset");

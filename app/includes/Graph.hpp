@@ -1,4 +1,6 @@
-#include <string>
+#ifndef _GRAPH_H
+#define _GRAPH_H
+
 #include <sys/mman.h>
 #include <limits.h>
 #include "./Utils.hpp"
@@ -8,12 +10,13 @@ class Graph {
 	public:
 		Graph() { };
 		Graph(std::string ds_path) {
+			this->ds_path = ds_path;
 			this->set_nodes_edges(ds_path);
 			this->allocate_memory();
 			//std::cout << "Nodes: " << this->nodes << " - Edges: " << this->edges << " - Max Node: " << this->max_node << " - Min Node: " << this->min_node << std::endl;
 		}
 
-		std::string ds_path;
+		
 		int nodes;
 		int edges;
 		int min_node = INT_MAX;
@@ -23,6 +26,7 @@ class Graph {
 		void freeMemory();
 
 	private:
+		std::string ds_path;
 		void set_nodes_edges(const std::string& ds_path);
 		void allocate_memory();
 		std::vector<int> parseLine(const std::string& line);
@@ -30,7 +34,6 @@ class Graph {
 };
 
 void Graph::set_nodes_edges(const std::string& ds_path) { // Read the file and get the number of nodes and edges from the description
-	this->ds_path = ds_path;
 	std::ifstream file = readDataset(this->ds_path);
 	std::string line;
     for (int i = 0; i < 2; ++i) std::getline(file, line);
@@ -103,3 +106,5 @@ void Graph::freeMemory() {
 	if (munmap(this->np_pointer, this->edges) != 0)
     	throw std::runtime_error("Free memory failed\n");
 }
+
+#endif

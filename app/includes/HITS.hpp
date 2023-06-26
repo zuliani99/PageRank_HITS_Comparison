@@ -1,6 +1,6 @@
 #include "Graph.hpp"
 
-class HITS: public Graph {
+class HITS {
 	public: 
 		HITS();
 	private:
