@@ -8,8 +8,11 @@
 #include <vector>
 #include <algorithm>
 #include <numeric>
+#include <map>
 
 typedef std::pair<unsigned int, unsigned int> nodes_pair;
+typedef std::map<unsigned int, unsigned int> card_map;
+
 
 
 bool compareByFirst(const nodes_pair& pair1, const nodes_pair& pair2) {
