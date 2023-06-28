@@ -44,7 +44,7 @@ void PageRank::set_cardinality_dangling(){
 
 	// TODO: check with a simple example if this works correctly
 
-	std::stable_sort(this->graph.np_pointer, this->graph.np_pointer + this->graph.nodes, compareByFirst);
+	std::stable_sort(this->graph.np_pointer, this->graph.np_pointer + this->graph.nodes, compareByFirstIncreasing);
 
 	for (int i = 0; i < this->graph.edges; i++) {
 		if (predecessor == this->graph.np_pointer[i].first) {

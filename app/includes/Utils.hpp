@@ -15,19 +15,25 @@ typedef std::map<unsigned int, unsigned int> card_map;
 
 
 
-bool compareByFirst(const nodes_pair& pair1, const nodes_pair& pair2) {
+bool compareByFirstIncreasing(const nodes_pair& pair1, const nodes_pair& pair2) {
     return pair1.first < pair2.first;
 }
 
-bool compareBySecond(const nodes_pair& pair1, const nodes_pair& pair2) {
+bool compareBySecondIncreasing(const nodes_pair& pair1, const nodes_pair& pair2) {
     return pair1.second < pair2.second;
 }
+
+bool compareBySecondDecreasing(const std::pair<int, int>& pair1, const std::pair<int, int>& pair2) {
+    return pair1.second > pair2.second;
+}
+
 
 
 bool compare(const int& a, const int& b, const std::vector<int>& values) {
     return values[a] > values[b];
 }
 
+// See if it can be usefull later (InDegree do not use it)
 std::vector<int> argsort(const std::vector<int>& input) {
     std::vector<int> indices(input.size());
     std::iota(indices.begin(), indices.end(), 0);

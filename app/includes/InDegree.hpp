@@ -5,46 +5,45 @@ class InDegree {
 		InDegree(std::vector<int> top_k, std::string ds_path) {
 			this->top_k = top_k;
 			this->graph = Graph(ds_path);
-        	this->In_Deg_Prestige.resize(this->graph.nodes, 0);
 
-			std::stable_sort(this->graph.np_pointer, this->graph.np_pointer + this->graph.nodes, compareByFirst);
-			std::stable_sort(this->graph.np_pointer, this->graph.np_pointer + this->graph.nodes, compareBySecond);
+			std::stable_sort(this->graph.np_pointer, this->graph.np_pointer + this->graph.nodes, compareByFirstIncreasing);
+			std::stable_sort(this->graph.np_pointer, this->graph.np_pointer + this->graph.nodes, compareBySecondIncreasing);
 
+			/*for(int i = 0; i < this->graph.edges; i++) {
+				std::cout << this->graph.np_pointer[i].first << " " << this->graph.np_pointer[i].second << std::endl;
+			}*/
 		}
 
 		std::vector<int> top_k;
 		std::vector<std::pair<int, std::vector<std::pair<int, int>>>> top_k_results;
-		std::vector<int> In_Deg_Prestige;
-		int steps = this->graph.edges;
+		std::unordered_map<int, int> In_Deg_Prestige;
 		void compute();
 		void get_topk_results();
 		void print_topk_results();
-
 		
 	private:
-
 		Graph graph;
 };
 
 
 void InDegree::compute() {
 	for(int i = 0; i < this->graph.edges; i++) {
-		//this->In_Deg_Prestige[this->graph.np_pointer[i].first - this->graph.min_node] += 1;
-		this->In_Deg_Prestige[this->graph.np_pointer[i].second - this->graph.min_node] += 1;
+		//std::cout << "I'm checking: (" << this->graph.np_pointer[i].first << " " << this->graph.np_pointer[i].second << ")\n"; 
+		this->In_Deg_Prestige[this->graph.np_pointer[i].second] += 1;
+		//std::cout << this->In_Deg_Prestige[this->graph.np_pointer[i].second] << std::endl;
 	}
 }
 
 void InDegree::get_topk_results() {
-	std::vector<int> sortedIndices = argsort(this->In_Deg_Prestige);
+	std::vector<std::pair<int, int>> in_deg_vec_pairs(this->In_Deg_Prestige.begin(), this->In_Deg_Prestige.end());
+	std::sort(in_deg_vec_pairs.begin(), in_deg_vec_pairs.end(), compareBySecondDecreasing);
+
 	for(int k : this->top_k) {
-		std::vector<int> final_topk(sortedIndices.begin(), sortedIndices.begin() + k);
-		std::vector<std::pair<int, int>> topk_result;
-		for(int i = 0; i < k; i++) {
-			topk_result.push_back(std::make_pair(final_topk[i], this->In_Deg_Prestige[final_topk[i]]));
-		}
-		this->top_k_results.push_back(std::make_pair(k, topk_result));
+		std::vector<std::pair<int, int>> final_top_k(in_deg_vec_pairs.begin(), in_deg_vec_pairs.begin() + k);
+		this->top_k_results.push_back(std::make_pair(k, final_top_k));
 	}
 	this->graph.freeMemory();
+
 }
 
 void InDegree::print_topk_results() {
