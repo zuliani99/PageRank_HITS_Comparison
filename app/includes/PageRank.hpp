@@ -84,7 +84,11 @@ void PageRank::set_cardinality_dangling(){
 
 
 void PageRank::set_T_matrix() {
+	std::stable_sort(this->graph.np_pointer, this->graph.np_pointer + this->graph.nodes, compareBySecondIncreasing);
 
+	for (int i = 0; i < this->graph.edges; i++) {
+
+	}
 }
 
 
