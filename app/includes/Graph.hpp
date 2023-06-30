@@ -13,7 +13,7 @@ class Graph {
 			this->ds_path = ds_path;
 			this->set_nodes_edges(ds_path);
 			this->allocate_memory();
-			//std::cout << "Nodes: " << this->nodes << " - Edges: " << this->edges << " - Max Node: " << this->max_node << " - Min Node: " << this->min_node << std::endl;
+			std::cout << "Nodes: " << this->nodes << " - Edges: " << this->edges << " - Max Node: " << this->max_node << " - Min Node: " << this->min_node << std::endl;
 		}
 
 		

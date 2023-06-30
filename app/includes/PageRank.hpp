@@ -7,10 +7,12 @@ class PageRank {
 			this->graph = Graph(ds_path);
         	this->PR_Prestige.resize(this->graph.nodes, 1. / this->graph.nodes);
 
-			this->set_cardinality_dangling();
 			// Create dangling nodes
 			// Create cardinality map
+			this->set_cardinality_dangling();
+			
 			// Create transpose matrix
+			this->set_T_matrix();
 		}
 
 		std::vector<int> top_k;
@@ -23,6 +25,7 @@ class PageRank {
 
 		void set_cardinality_dangling();
 		void add_danglings(int start, int end);
+		void set_T_matrix();
 
 		
 	private:
@@ -42,28 +45,46 @@ void PageRank::set_cardinality_dangling(){
 	int predecessor = -1;
 	int cardinality = 0;
 
-	// TODO: check with a simple example if this works correctly
-
 	std::stable_sort(this->graph.np_pointer, this->graph.np_pointer + this->graph.nodes, compareByFirstIncreasing);
 
 	for (int i = 0; i < this->graph.edges; i++) {
 		if (predecessor == this->graph.np_pointer[i].first) {
 			cardinality++;
-		}else {
-			this->cardinality_map[predecessor] = cardinality;
-			
-			if (this->graph.np_pointer[i].first - predecessor > 1)
+		} else {
+			if (predecessor == -1) {
 				this->add_danglings(predecessor, this->graph.np_pointer[i].first);
-
-			cardinality = 0;
+			} else {
+				this->cardinality_map[predecessor] = cardinality;
+				
+				if (this->graph.np_pointer[i].first - predecessor > 1)
+					this->add_danglings(predecessor, this->graph.np_pointer[i].first);
+			}
 			predecessor = this->graph.np_pointer[i].first;
+			cardinality = 1;
 		}
 	}
 
  	if ((this->graph.max_node) - (this->graph.np_pointer[this->graph.edges - 1].first) > 0)
-		this->add_danglings(this->graph.np_pointer[this->graph.edges - 1].first, this->graph.max_node);
+		this->add_danglings(this->graph.np_pointer[this->graph.edges - 1].first, this->graph.max_node + 1);
 
     this->cardinality_map[predecessor] = cardinality;
+
+
+	// Debug print
+	std::cout << "Dangling nodes: " << std::endl;
+	for(int i = 0; i < this->dangling_nodes.size(); i++) {
+		std::cout << this->dangling_nodes[i] << std::endl;
+	}
+	std::cout << std::endl << "Cardionality map: " << std::endl;
+	for (auto p : this->cardinality_map) {
+		std::cout << "Node id: " << p.first << " - deg: " << p.second << std::endl;
+	}
+
+}
+
+
+void PageRank::set_T_matrix() {
+
 }
 
 

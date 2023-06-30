@@ -10,14 +10,19 @@ int main(){
 
 	for (auto ds : datasets) {
 		std::cout << "-------------------" << ds << "---------------------" << std::endl;
-		std::cout << "IN DEGREE" << std::endl;
+		
+		// InDegree
+		std::cout << "IN_DEGREE" << std::endl;
 		InDegree in_degree = InDegree(top_k, ds);
 		in_degree.compute();
 		in_degree.get_topk_results();
 		in_degree.print_topk_results();
 
+		std::cout << std::endl;
 
 		// PageRank
+		std::cout << "PAGE_RANK" << std::endl;
+		PageRank page_rank = PageRank(top_k, ds, 0.8);
 
 
 		// HITS
