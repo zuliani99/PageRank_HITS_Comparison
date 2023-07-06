@@ -36,7 +36,7 @@ void InDegree::compute() {
 
 void InDegree::get_topk_results() {
 	std::vector<std::pair<int, int>> in_deg_vec_pairs(this->In_Deg_Prestige.begin(), this->In_Deg_Prestige.end());
-	std::sort(in_deg_vec_pairs.begin(), in_deg_vec_pairs.end(), compareBySecondDecreasing);
+	std::sort(in_deg_vec_pairs.begin(), in_deg_vec_pairs.end(), compareBySecondDecreasing<int, int>);
 
 	for(int k : this->top_k) {
 		std::vector<std::pair<int, int>> final_top_k(in_deg_vec_pairs.begin(), in_deg_vec_pairs.begin() + k);

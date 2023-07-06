@@ -10,9 +10,9 @@
 #include <numeric>
 #include <map>
 
-typedef std::pair<unsigned int, unsigned int> nodes_pair;
-typedef std::map<unsigned int, unsigned int> card_map;
-
+typedef std::pair<int, int> nodes_pair;
+typedef std::map<int, int> card_map;
+typedef std::pair<double, int> traspose_pair;
 
 
 bool compareByFirstIncreasing(const nodes_pair& pair1, const nodes_pair& pair2) {
@@ -23,7 +23,8 @@ bool compareBySecondIncreasing(const nodes_pair& pair1, const nodes_pair& pair2)
     return pair1.second < pair2.second;
 }
 
-bool compareBySecondDecreasing(const std::pair<int, int>& pair1, const std::pair<int, int>& pair2) {
+template<typename T, typename D>
+bool compareBySecondDecreasing(const std::pair<T, D>& pair1, const std::pair<T, D>& pair2) {
     return pair1.second > pair2.second;
 }
 

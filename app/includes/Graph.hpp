@@ -13,7 +13,7 @@ class Graph {
 			this->ds_path = ds_path;
 			this->set_nodes_edges(ds_path);
 			this->allocate_memory();
-			std::cout << "Nodes: " << this->nodes << " - Edges: " << this->edges << " - Max Node: " << this->max_node << " - Min Node: " << this->min_node << std::endl;
+			//std::cout << "Nodes: " << this->nodes << " - Edges: " << this->edges << " - Max Node: " << this->max_node << " - Min Node: " << this->min_node << std::endl;
 		}
 
 		
@@ -84,7 +84,7 @@ void Graph::updateMinMaxNodes(const std::vector<int>& pair) {
 void Graph::allocate_memory() {
     this->np_pointer = (nodes_pair*)mmap(NULL, this->edges * sizeof(nodes_pair), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
     if (this->np_pointer == MAP_FAILED)
-        throw std::runtime_error("Mapping Failed\n");
+        throw std::runtime_error("Mapping np_pointer Failed\n");
     
     std::ifstream file = readDataset(this->ds_path);
     std::string line;
