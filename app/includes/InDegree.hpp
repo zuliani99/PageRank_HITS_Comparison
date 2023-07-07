@@ -17,9 +17,12 @@ class InDegree {
 		std::vector<int> top_k;
 		top_k_results<int> IN_topk;
 		std::unordered_map<int, int> In_Deg_Prestige;
+		Duration elapsed;
+
 		void compute();
 		void get_topk_results();
 		void print_topk_results();
+		void print_stats();
 		
 	private:
 		Graph graph;
@@ -27,11 +30,13 @@ class InDegree {
 
 
 void InDegree::compute() {
+	auto start = now();
 	for(int i = 0; i < this->graph.edges; i++) {
 		//std::cout << "I'm checking: (" << this->graph.np_pointer[i].first << " " << this->graph.np_pointer[i].second << ")\n"; 
 		this->In_Deg_Prestige[this->graph.np_pointer[i].second] += 1;
 		//std::cout << this->In_Deg_Prestige[this->graph.np_pointer[i].second] << std::endl;
 	}
+	this->elapsed = now() - start;
 }
 
 void InDegree::get_topk_results() {
@@ -55,4 +60,8 @@ void InDegree::print_topk_results() {
 			i++;
 		}
 	}
+}
+
+void InDegree::print_stats() {
+	std::cout << "Elapsed: " << this->elapsed.count() << " ms" << std::endl;
 }

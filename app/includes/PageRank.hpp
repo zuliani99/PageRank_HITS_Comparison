@@ -20,10 +20,12 @@ class PageRank {
 		top_k_results<double> PR_topk;
 		std::unordered_map<int, double> PR_Prestige;
 		int steps = 0;
+		Duration elapsed;
 		
 		void compute();
 		void get_topk_results();
 		void print_topk_results();
+		void print_stats();
 
 
 		
@@ -34,8 +36,10 @@ class PageRank {
 		std::vector<int> dangling_nodes;
 		std::vector<int> row_ptr;
 		traspose_pair* pt_traspose;
-		std::vector<std::pair<int, int>> row_pointers; // vector that store the row pointer and to node id of each edge 
+		// vector that store the row pointer and to node id of each edge 
 
+		std::vector<std::pair<int, int>> row_pointers; 
+		
 		void set_cardinality_dangling();
 		void add_danglings(int start, int end);
 		void set_T_matrix();
@@ -107,6 +111,8 @@ void PageRank::compute() {
 	std::unordered_map<int, double> temp_PR_Prestige;
 	for (int i = 0; i < this->graph.nodes; i++) temp_PR_Prestige[i] = 1. / this->graph.nodes;
 
+	auto start = now();
+
 	do {
 		double dangling_Pk = 0.;
 		int temp_row_pt = 0;
@@ -132,6 +138,8 @@ void PageRank::compute() {
 			temp_PR_Prestige[i] = ((dangling_Pk + temp_PR_Prestige[i]) * this->t_prob) + (1 - this->t_prob) / this->graph.nodes;
 
 	} while(this->converge(temp_PR_Prestige));
+
+	this->elapsed = now() - start;
 
 }
 
@@ -170,4 +178,8 @@ void PageRank::print_topk_results() {
 			i++;
 		}
 	}
+}
+
+void PageRank::print_stats() {
+	std::cout << "Elapsed: " << this->elapsed.count() << " ms \t Steps: "<< this->steps << std::endl;
 }

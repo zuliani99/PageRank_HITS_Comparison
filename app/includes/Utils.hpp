@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+#include <chrono>
 #include <filesystem>
 #include <vector>
 #include <algorithm>
@@ -23,6 +24,10 @@ using traspose_pair = std::pair<double, int>;
 // typedef for the result of each algorithm for all top_k
 template<typename T>
 using top_k_results = std::map<int, std::vector<std::pair<int, T>>>;
+
+// time execution satements
+static auto now = std::chrono::high_resolution_clock::now;
+using Duration = std::chrono::duration<double, std::milli>;
 
 
 bool compareByFirstIncreasing(const nodes_pair& pair1, const nodes_pair& pair2) {
