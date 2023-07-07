@@ -9,8 +9,7 @@ class PageRank {
 			
 			for (int i = 0; i < this->graph.nodes; i++) this->PR_Prestige[i] = 1. / this->graph.nodes;
 
-			// Create dangling nodes
-			// Create cardinality map
+			// Create dangling nodes and cardinality map
 			this->set_cardinality_dangling();
 			
 			// Create transpose matrix
@@ -18,7 +17,7 @@ class PageRank {
 		}
 
 		std::vector<int> top_k;
-		std::vector<std::pair<int, std::vector<std::pair<int, double>>>> top_k_results;
+		top_k_results<double> PR_topk;
 		std::unordered_map<int, double> PR_Prestige;
 		int steps = 0;
 		
@@ -77,30 +76,12 @@ void PageRank::set_cardinality_dangling(){
 		this->add_danglings(this->graph.np_pointer[this->graph.edges - 1].first, this->graph.max_node + 1);
 
     this->cardinality_map[predecessor] = cardinality;
-
-
-	// Debug print
-	/*std::cout << "Dangling nodes: " << std::endl;
-	for(int i = 0; i < this->dangling_nodes.size(); i++) {
-		std::cout << this->dangling_nodes[i] << std::endl;
-	}
-	std::cout << std::endl << "Cardionality map: " << std::endl;
-	for (auto p : this->cardinality_map) {
-		std::cout << "Node id: " << p.first << " - deg: " << p.second << std::endl;
-	}*/
-
 }
 
 
 void PageRank::set_T_matrix() {
-	/*for (int i = 0; i < this->graph.edges; i++)
-		std::cout << this->graph.np_pointer[i].first << " " << this->graph.np_pointer[i].second << std::endl;*/
 
 	std::stable_sort(this->graph.np_pointer, this->graph.np_pointer + this->graph.edges, compareBySecondIncreasing);
-
-	/*std::cout << "Sorted by the second element:" << std::endl;
-	for (int i = 0; i < this->graph.edges; i++)
-		std::cout << this->graph.np_pointer[i].first << " " << this->graph.np_pointer[i].second << std::endl;*/
 
     this->pt_traspose = (traspose_pair*)mmap(NULL, this->graph.edges * sizeof(traspose_pair), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
 	if (this->pt_traspose == MAP_FAILED)
@@ -108,25 +89,14 @@ void PageRank::set_T_matrix() {
 
 
 	for (int i = 0; i < this->graph.edges; i++) {
-		//if (i != 0)
-			//std::cout << this->graph.np_pointer[i].second << " " << this->graph.np_pointer[i - 1].second << std::endl;
+
 		if(i == 0 || this->graph.np_pointer[i].second != this->graph.np_pointer[i - 1].second)
 			this->row_pointers.push_back(std::make_pair(i, this->graph.np_pointer[i].second));
 
-		//std::cout << (this->cardinality_map.find(this->graph.np_pointer[i].first) != this->cardinality_map.end()) << std::endl;
-
 		this->pt_traspose[i] = traspose_pair(1. / this->cardinality_map[this->graph.np_pointer[i].first], this->graph.np_pointer[i].first);
-		//std::cout << this->graph.edges << " " << i << " " << this->pt_traspose[i].first << " " << this->pt_traspose[i].second << std::endl;
 	}
 
 	this->row_pointers.push_back(std::make_pair(0, 0));
-
-	/*for (int i = 0; i < this->graph.edges; i++) 
-		std::cout << "1/k: " << this->pt_traspose[i].first << " - to_node_id: " << this->pt_traspose[i].second << std::endl;
-
-	for (int i = 0; i < row_pointers.size(); i++) 
-		std::cout << "row_ptr: " << this->row_pointers[i].first << " - np_pointer second: " << this->row_pointers[i].second << std::endl;*/
-	
 	this->graph.freeMemory();
 
 }
@@ -172,8 +142,6 @@ bool PageRank::converge(std::unordered_map<int, double> &temp_Pk) {
 		distance += std::abs(this->PR_Prestige[i] - temp_Pk[i]);
 
 	this->PR_Prestige = temp_Pk;
-	//for (int i = 0; i < temp_Pk.size(); i++)
-		//this->PR_Prestige[i] = temp_Pk[i];
 
 	temp_Pk.clear();
 	for (int i = 0; i < this->graph.nodes; i++) temp_Pk[i] = 1. / this->graph.nodes;
@@ -188,13 +156,13 @@ void PageRank::get_topk_results() {
 
 	for(int k : this->top_k) {
 		std::vector<std::pair<int, double>> final_top_k(PR_Prestige_vec_pairs.begin(), PR_Prestige_vec_pairs.begin() + k);
-		this->top_k_results.push_back(std::make_pair(k, final_top_k));
+		this->PR_topk[k] = final_top_k;
 	}
 }
 
 
 void PageRank::print_topk_results() {
-	for (auto p : this->top_k_results){
+	for (auto p : this->PR_topk){
 		std::cout << "Top " << p.first << std::endl;
 		int i = 1;
 		for (auto node : p.second) {

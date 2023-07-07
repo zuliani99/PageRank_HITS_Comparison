@@ -15,7 +15,7 @@ class InDegree {
 		}
 
 		std::vector<int> top_k;
-		std::vector<std::pair<int, std::vector<std::pair<int, int>>>> top_k_results;
+		top_k_results<int> IN_topk;
 		std::unordered_map<int, int> In_Deg_Prestige;
 		void compute();
 		void get_topk_results();
@@ -40,14 +40,14 @@ void InDegree::get_topk_results() {
 
 	for(int k : this->top_k) {
 		std::vector<std::pair<int, int>> final_top_k(in_deg_vec_pairs.begin(), in_deg_vec_pairs.begin() + k);
-		this->top_k_results.push_back(std::make_pair(k, final_top_k));
+		this->IN_topk[k] = final_top_k;
 	}
 	this->graph.freeMemory();
 
 }
 
 void InDegree::print_topk_results() {
-	for (auto p : this->top_k_results){
+	for (auto p : this->IN_topk){
 		std::cout << "Top " << p.first << std::endl;
 		int i = 1;
 		for (auto node : p.second) {

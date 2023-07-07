@@ -1,5 +1,5 @@
-#ifndef _UG_H
-#define _UG_H
+#ifndef _UTILS_H
+#define _UTILS_H
 
 #include <fstream>
 #include <string>
@@ -9,10 +9,20 @@
 #include <algorithm>
 #include <numeric>
 #include <map>
+#include <bits/stdc++.h>
 
-typedef std::pair<int, int> nodes_pair;
-typedef std::map<int, int> card_map;
-typedef std::pair<double, int> traspose_pair;
+// typedef for a pair of node: (from_node_id, to_node_id)
+using nodes_pair = std::pair<int, int>;
+
+// typedef for the cardinality map: (node_id, cardinality)
+using card_map = std::map<int, int>;
+
+// typedef for the transpose matrix: (value, from_node_id)
+using traspose_pair = std::pair<double, int>;
+
+// typedef for the result of each algorithm for all top_k
+template<typename T>
+using top_k_results = std::map<int, std::vector<std::pair<int, T>>>;
 
 
 bool compareByFirstIncreasing(const nodes_pair& pair1, const nodes_pair& pair2) {
@@ -27,25 +37,6 @@ template<typename T, typename D>
 bool compareBySecondDecreasing(const std::pair<T, D>& pair1, const std::pair<T, D>& pair2) {
     return pair1.second > pair2.second;
 }
-
-
-
-bool compare(const int& a, const int& b, const std::vector<int>& values) {
-    return values[a] > values[b];
-}
-
-// See if it can be usefull later (InDegree do not use it)
-std::vector<int> argsort(const std::vector<int>& input) {
-    std::vector<int> indices(input.size());
-    std::iota(indices.begin(), indices.end(), 0);
-
-    std::sort(indices.begin(), indices.end(), [&](int a, int b) {
-        return compare(a, b, input);
-    });
-
-    return indices;
-}
-
 
 
 // Fucntion that return the std::vector of dataset contained in the given directory path
@@ -69,6 +60,5 @@ std::ifstream readDataset(const std::string& filepath) {
     }
     return file;
 }
-
 
 #endif

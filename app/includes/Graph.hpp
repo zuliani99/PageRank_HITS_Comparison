@@ -8,7 +8,11 @@
 
 class Graph {
 	public:
+
+		// Default constructor
 		Graph() { };
+
+		// Graph constructor
 		Graph(std::string ds_path) {
 			this->ds_path = ds_path;
 			this->set_nodes_edges(ds_path);
@@ -33,7 +37,8 @@ class Graph {
 		void updateMinMaxNodes(const std::vector<int>& pair);
 };
 
-void Graph::set_nodes_edges(const std::string& ds_path) { // Read the file and get the number of nodes and edges from the description
+// Read the file and get the number of nodes and edges from the description
+void Graph::set_nodes_edges(const std::string& ds_path) { 
 	std::ifstream file = readDataset(this->ds_path);
 	std::string line;
     for (int i = 0; i < 2; ++i) std::getline(file, line);
@@ -54,7 +59,7 @@ void Graph::set_nodes_edges(const std::string& ds_path) { // Read the file and g
     }
 }
 
-
+// Function to parse the string line
 std::vector<int> Graph::parseLine(const std::string& line) {
     std::istringstream line_stream(line);
     std::string str;
@@ -68,6 +73,7 @@ std::vector<int> Graph::parseLine(const std::string& line) {
 }
 
 
+// Function to update the minimum and maximum node given a pair of nodes
 void Graph::updateMinMaxNodes(const std::vector<int>& pair) {
     if (pair[0] < this->min_node)
         this->min_node = pair[0];
@@ -81,15 +87,20 @@ void Graph::updateMinMaxNodes(const std::vector<int>& pair) {
 }
 
 
+// Functio to allocate permanent memory 
 void Graph::allocate_memory() {
+
+	// Allocate the right amount of memory
     this->np_pointer = (nodes_pair*)mmap(NULL, this->edges * sizeof(nodes_pair), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
     if (this->np_pointer == MAP_FAILED)
         throw std::runtime_error("Mapping np_pointer Failed\n");
     
+	// Start reading the dataset
     std::ifstream file = readDataset(this->ds_path);
     std::string line;
     int i = 0;
     
+	// For each line until we pass through all the file
     while (std::getline(file, line)) {
         if (line[0] != '#') {
             std::vector<int> pair = this->parseLine(line);
@@ -102,6 +113,7 @@ void Graph::allocate_memory() {
     file.close();
 }
 
+// Function to free the permanent memory
 void Graph::freeMemory() {
 	if (munmap(this->np_pointer, this->edges) != 0)
     	throw std::runtime_error("Free memory failed\n");

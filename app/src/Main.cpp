@@ -1,6 +1,7 @@
 #include "../includes/InDegree.hpp"
 #include "../includes/PageRank.hpp"
 //#include "../includes/HITS.hpp"
+#include "../includes/Jaccard.hpp"
 
 int main(){
 	//std::vector<std::string> datasets = getDatasetsTXT("../dataset");
