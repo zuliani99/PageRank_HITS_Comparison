@@ -10,7 +10,6 @@
 #include <algorithm>
 #include <numeric>
 #include <map>
-// #include <bits/stdc++.h>
 
 // typedef for a pair of node: (from_node_id, to_node_id)
 using nodes_pair = std::pair<int, int>;

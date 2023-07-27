@@ -23,7 +23,7 @@ class Graph {
 		
 		int nodes;
 		int edges;
-		int min_node = INT_MAX;
+		int min_node = INT32_MAX;
 		int max_node = 0;
 		nodes_pair* np_pointer;
 

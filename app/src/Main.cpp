@@ -5,8 +5,8 @@
 
 int main(){
 	//std::vector<std::string> datasets = getDatasetsTXT("../dataset");
-	std::vector<std::string> datasets = {"../dataset/web-Stanford.txt"};
-	//std::vector<std::string> datasets = {"../dataset/test-dataset.txt"};
+	//std::vector<std::string> datasets = {"../dataset/web-Stanford.txt"};
+	std::vector<std::string> datasets = {"../dataset/test-dataset.txt"};
 	std::vector<int> top_k = {10};//, 20, 30, 40, 50};
 
 	for (auto ds : datasets) {
