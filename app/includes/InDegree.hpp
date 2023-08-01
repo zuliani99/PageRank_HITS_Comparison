@@ -28,7 +28,6 @@ class InDegree {
 		Graph graph;
 };
 
-
 void InDegree::compute() {
 	auto start = now();
 	for(int i = 0; i < this->graph.edges; i++) {

@@ -27,8 +27,6 @@ class PageRank {
 		void print_topk_results();
 		void print_stats();
 
-
-		
 	private:
 		Graph graph;
 		const double t_prob;
@@ -47,7 +45,6 @@ class PageRank {
 
 };
 
-// OK
 void PageRank::add_danglings(int start, int end) {
 	for (int dan = start + 1; dan <= end - 1; dan++)
 		this->dangling_nodes.push_back(dan);
@@ -84,7 +81,7 @@ void PageRank::set_card_map_and_dan_node(){
     this->cardinality_map[predecessor] = cardinality;
 }
 
-// CAPIRE SE VA BENE E MODIFICARE IN CASO
+
 void PageRank::set_T_matrix() {
 
 	std::stable_sort(this->graph.np_pointer, this->graph.np_pointer + this->graph.edges, compareBySecondIncreasing);
@@ -107,7 +104,7 @@ void PageRank::set_T_matrix() {
 
 }
 
-// CAPIRE SE VA BENE E MODIFICARE IN CASO
+
 void PageRank::compute() {
 
 	std::unordered_map<int, double> temp_PR_Prestige;
@@ -145,7 +142,7 @@ void PageRank::compute() {
 
 }
 
-// vediamo
+
 bool PageRank::converge(std::unordered_map<int, double> &temp_Pk) {
 	double distance = 0.;
 	for (int i = 0; i < temp_Pk.size(); i++) 
@@ -159,7 +156,7 @@ bool PageRank::converge(std::unordered_map<int, double> &temp_Pk) {
 	return distance > std::pow(10, -6);
 }
  
-// OK
+
 void PageRank::get_topk_results() {
 	std::vector<std::pair<int, double>> PR_Prestige_vec_pairs(this->PR_Prestige.begin(), this->PR_Prestige.end());
 	std::sort(PR_Prestige_vec_pairs.begin(), PR_Prestige_vec_pairs.end(), compareBySecondDecreasing<int, double>);
@@ -170,7 +167,7 @@ void PageRank::get_topk_results() {
 	}
 }
 
-// OK
+
 void PageRank::print_topk_results() {
 	for (auto p : this->PR_topk){
 		std::cout << "Top " << p.first << std::endl;

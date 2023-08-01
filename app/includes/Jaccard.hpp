@@ -32,7 +32,7 @@ class JaccardCoefficient {
 		
 };
 
-// Return the map for each k composed by the first element of each pair
+// Function that returns the map for each k composed by the first element of each pair
 template<typename T>
 std::map<int, std::vector<int>> JaccardCoefficient::get_first_element_vector(top_k_results<T> &topk_vector) {
 	std::map<int, std::vector<int>> jaccard_results;
@@ -47,7 +47,6 @@ std::map<int, std::vector<int>> JaccardCoefficient::get_first_element_vector(top
 	return jaccard_results;
 }
 
-
 std::vector<int> JaccardCoefficient::intersection(std::vector<int> &v1, std::vector<int> &v2) {
     std::vector<int> intersect;
  
@@ -58,8 +57,7 @@ std::vector<int> JaccardCoefficient::intersection(std::vector<int> &v1, std::vec
     return intersect;
 }
 
-
-// Function to return the Jaccard index of two sets
+// Function that returns the Jaccard index of two sets
 double JaccardCoefficient::jaccard_distance(std::vector<int> &v1, std::vector<int> &v2) {
  
     // Get the intersection Size set
@@ -68,7 +66,6 @@ double JaccardCoefficient::jaccard_distance(std::vector<int> &v1, std::vector<in
     // Return the Jaccard Distance using the formula and the Jaccard Index
     return 1 - (size_in / (v1.size() + v2.size() - size_in));
 }
-
 
 void JaccardCoefficient::obtain_results() {
 	for (int k : this->topk) {
@@ -87,7 +84,6 @@ void JaccardCoefficient::obtain_results() {
 	}
 }
 
-
 void JaccardCoefficient::print_results() {
 	for(auto pair1 : this->jaccard_results) {
 		std::cout << "TOP " << pair1.first;
@@ -97,7 +93,5 @@ void JaccardCoefficient::print_results() {
 	}
 
 }
-
-
 
 #endif

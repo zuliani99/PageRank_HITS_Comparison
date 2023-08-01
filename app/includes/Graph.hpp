@@ -8,7 +8,6 @@
 
 class Graph {
 	public:
-
 		// Default constructor
 		Graph() { };
 
@@ -19,8 +18,7 @@ class Graph {
 			this->allocate_memory();
 			//std::cout << "Nodes: " << this->nodes << " - Edges: " << this->edges << " - Max Node: " << this->max_node << " - Min Node: " << this->min_node << std::endl;
 		}
-
-		
+        
 		int nodes;
 		int edges;
 		int min_node = INT32_MAX;
@@ -87,7 +85,7 @@ void Graph::updateMinMaxNodes(const std::vector<int>& pair) {
 
 // Function that allocates permanent memory 
 void Graph::allocate_memory() {
-
+    
 	// Allocating the right amount of memory
     this->np_pointer = (nodes_pair*)mmap(NULL, this->edges * sizeof(nodes_pair), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
     if (this->np_pointer == MAP_FAILED)
