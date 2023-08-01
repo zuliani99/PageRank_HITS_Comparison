@@ -17,7 +17,7 @@ using nodes_pair = std::pair<int, int>;
 // typedef for the cardinality map: (node_id, cardinality)
 using card_map = std::map<int, int>;
 
-// typedef for the transpose matrix: (value, from_node_id)
+// typedef for the transpose matrix: (value, from_node_id) -> used for the sparse matrix representation
 using traspose_pair = std::pair<double, int>;
 
 // typedef for the result of each algorithm for all top_k
