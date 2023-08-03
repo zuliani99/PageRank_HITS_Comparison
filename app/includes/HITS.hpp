@@ -86,27 +86,27 @@ class HITS {
 
 // Function that computes the adjacency matrix L
 void HITS::compute_L(){
-        // Allocating the right amount of space in permanent memory to save the edges of graph as a set of pairs
-        this->L_ptr = (unsigned int*)mmap(NULL, this->graph.edges * sizeof(unsigned int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
+	// Allocating the right amount of space in permanent memory to save the edges of graph as a set of pairs
+	this->L_ptr = (unsigned int*)mmap(NULL, this->graph.edges * sizeof(unsigned int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
 
-        // Checking the allocation
-        if (L_ptr == MAP_FAILED){
-            throw std::runtime_error("Mapping failed\n");
-        }
+	// Checking the allocation
+	if (L_ptr == MAP_FAILED){
+		throw std::runtime_error("Mapping failed\n");
+	}
 
-        this->row_ptr_L.push_back(0);
-        this->row_ptr_not_empty_L.push_back(this->graph.np_pointer[0].first - this->graph.min_node);
+	this->row_ptr_L.push_back(0);
+	this->row_ptr_not_empty_L.push_back(this->graph.np_pointer[0].first - this->graph.min_node);
 
-        // Computing L
-        for (unsigned int i = 0; i < this->graph.edges; i++){
-            if (i > 0 && this->graph.np_pointer[i - 1].first != this->graph.np_pointer[i].first){
-                row_ptr_L.push_back(i);
-                this->row_ptr_not_empty_L.push_back(this->graph.np_pointer[i].first - this->graph.min_node);
-            }
-            this->L_ptr[i] = this->graph.np_pointer[i].second;
-        }
-        this->row_ptr_L.push_back(this->graph.edges);
-    }
+	// Computing L
+	for (unsigned int i = 0; i < this->graph.edges; i++){
+		if (i > 0 && this->graph.np_pointer[i - 1].first != this->graph.np_pointer[i].first){
+			row_ptr_L.push_back(i);
+			this->row_ptr_not_empty_L.push_back(this->graph.np_pointer[i].first - this->graph.min_node);
+		}
+		this->L_ptr[i] = this->graph.np_pointer[i].second;
+	}
+	this->row_ptr_L.push_back(this->graph.edges);
+}
 
 // Function that computes the transpose matrix of L
 void HITS::compute_L_t(){
@@ -299,7 +299,7 @@ void HITS::print_topk_authority() {
 		std::cout << "Top " << p.first << std::endl;
 		int i = 1;
 		for (auto node : p.second) {
-			std::cout << i << ") Node ID: " << node.first << " - Authorty score: " << node.second << std::endl;
+			std::cout << i << ") Node ID: " << node.first << " - Authority score: " << node.second << std::endl;
 			i++;
 		}
 	}
