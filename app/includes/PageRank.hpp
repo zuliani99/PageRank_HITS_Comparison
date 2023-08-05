@@ -120,7 +120,7 @@ void PageRank::set_T_matrix() {
 		if(j == 0 || this->graph.np_pointer[j].second != this->graph.np_pointer[j - 1].second)
 			this->row_pointers.push_back(std::make_pair(j, this->graph.np_pointer[j].second));
 											
-		// from j to 1 the 1/outgoing edges of the j
+											// 1/Oi														 col_index
 		this->pt_traspose[j] = traspose_pair(1. / this->cardinality_map[this->graph.np_pointer[j].first], this->graph.np_pointer[j].first);
 	}
 
@@ -128,9 +128,15 @@ void PageRank::set_T_matrix() {
 	this->row_pointers.push_back(std::make_pair(-1, -1)); // to notify the conclusion of out transpose matrix
 	this->graph.freeMemory();
 
-	/*for(int i = 0; i < this->graph.edges; i++) {
-		std::cout << this->graph.np_pointer[i].first << " " << this->graph.np_pointer[i].second << " " << this->pt_traspose[i].first << std::endl;
-	}*/
+	for(int i = 0; i < this->graph.edges; i++) {
+		std::cout << this->pt_traspose[i].first << " " << this->pt_traspose[i].second << std::endl;
+	}
+	std::cout << std::endl;
+
+	for(int i = 0; i < this->row_pointers.size(); i++) {
+		std::cout << this->row_pointers[i].first << " " << this->row_pointers[i].second << std::endl;
+	}
+
 }
 
 
@@ -147,7 +153,7 @@ void PageRank::compute() {
 		double dangling_Pk = 0.;
 		// Page rank of dangling nodes
 		for(int dan : this->dangling_nodes){
-			dangling_Pk += this->PR_Prestige[dan] / this->graph.edges;
+			dangling_Pk += this->PR_Prestige[dan] / this->graph.edges; // - this->graph.min_node
 		}
 
 		int row_ptr = 0;
@@ -160,7 +166,6 @@ void PageRank::compute() {
 				new_row_ptr = this->row_pointers[row_ptr + 1].first;
 			}
 			// I have to update the same untill I change row, I'm considereing the to node id
-			// TODO: check the sense between this and the transpose where I do the .first
 			current_PR_Prestige[this->row_pointers[row_ptr].second] += this->pt_traspose[i].first * this->PR_Prestige[this->pt_traspose[i].second];
 		}
 
@@ -226,39 +231,6 @@ void PageRank::print_stats() {
 
 
 /*
-
-
-
-void PageRank::set_T_matrix() {
-
-	// Sort the sequence of pair of points by the second element by increasingly oder
-	std::stable_sort(this->graph.np_pointer, this->graph.np_pointer + this->graph.edges, compareBySecondIncreasing);
-	std::cout << "sorting by increasing order of the second element\n";
-	for(int i = 0; i < this->graph.edges; i++) {
-		std::cout << this->graph.np_pointer[i].first << " " << this->graph.np_pointer[i].second << std::endl;
-	}
-	std::cout << std::endl;
-
-    this->pt_traspose = (traspose_pair*)mmap(NULL, this->graph.edges * sizeof(traspose_pair), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
-	if (this->pt_traspose == MAP_FAILED)
-        throw std::runtime_error("Mapping pt_traspose Failed\n");
-
-
-	for (int j = 0; j < this->graph.edges; j++) {
-
-		//if(j == 0 || this->graph.np_pointer[i].second != this->graph.np_pointer[i - 1].second)
-			//this->row_pointers.push_back(std::make_pair(i, this->graph.np_pointer[i].second));
-
-		this->pt_traspose[j] = traspose_pair(1. / this->cardinality_map[this->graph.np_pointer[j].first], this->graph.np_pointer[j].first);
-	}
-
-	//this->row_pointers.push_back(std::make_pair(0, 0));
-	//this->graph.freeMemory();
-	
-	for(int i = 0; i < this->graph.edges; i++) {
-		std::cout << this->graph.np_pointer[i].first << " " << this->graph.np_pointer[i].second << " " << this->pt_traspose[i].first << std::endl;
-	}
-}
 
 // CAPIRE SE VA BENE E MODIFICARE IN CASO
 void PageRank::compute() {
