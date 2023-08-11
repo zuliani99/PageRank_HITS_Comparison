@@ -32,7 +32,7 @@ class PageRank {
 		const double t_prob;
 		card_map cardinality_map;
 		std::vector<int> dangling_nodes;
-		//std::vector<int> row_ptr;
+		std::string algo_str = "PageRank Prestige"; 
 		traspose_pair* pt_traspose;
 
 		// vector that store the row pointer and to node id of each edge 
@@ -195,28 +195,15 @@ bool PageRank::converge(std::unordered_map<int, double> &temp_Pk) {
 }
 
  
-
+// OK
 void PageRank::get_topk_results() {
-	std::vector<std::pair<int, double>> PR_Prestige_vec_pairs(this->PR_Prestige.begin(), this->PR_Prestige.end());
-	std::sort(PR_Prestige_vec_pairs.begin(), PR_Prestige_vec_pairs.end(), compareBySecondDecreasing<int, double>);
-
-	for(int k : this->top_k) {
-		std::vector<std::pair<int, double>> final_top_k(PR_Prestige_vec_pairs.begin(), PR_Prestige_vec_pairs.begin() + k);
-		this->PR_topk[k] = final_top_k;
-	}
+	this->graph.get_algo_topk_results<int, double>(this->PR_Prestige, this->top_k, this->PR_topk);
 }
 
 
 // OK
 void PageRank::print_topk_results() {
-	for (auto p : this->PR_topk){
-		std::cout << "Top " << p.first << std::endl;
-		int i = 1;
-		for (auto node : p.second) {
-			std::cout << i << ") Node ID: " << node.first << " - Page Rank Prestige value: " << node.second << std::endl;
-			i++;
-		}
-	}
+	this->graph.print_algo_topk_results<double>(this->PR_topk, this->algo_str);
 }
 
 

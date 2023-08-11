@@ -79,6 +79,9 @@ class HITS {
     	// Stores the empty line in L_t
     	std::vector<unsigned int> row_ptr_not_empty_L_t;
 
+		std::string autority_str = "Authority"; 
+		std::string hub_str = "Hub"; 
+
 		bool converge_authority(std::unordered_map<int, double> &temp);
 		bool converge_hub(std::unordered_map<int, double> &temp);
 		void normalize(std::unordered_map<int, double> &ak, std::unordered_map<int, double> &hk);
@@ -252,27 +255,18 @@ void HITS::normalize(std::unordered_map<int, double> &ak, std::unordered_map<int
 	}
 }
 
+
 // Function that gets the top-k nodes w.r.t. the authority score
 void HITS::get_topk_authority() {
-	std::vector<std::pair<int, double>> HITS_authority_vec_pairs(this->HITS_authority.begin(), this->HITS_authority.end());
-	std::sort(HITS_authority_vec_pairs.begin(), HITS_authority_vec_pairs.end(), compareBySecondDecreasing<int, double>);
-
-	for(int k : this->top_k) {
-		std::vector<std::pair<int, double>> final_top_k(HITS_authority_vec_pairs.begin(), HITS_authority_vec_pairs.begin() + k);
-		this->authority_topk[k] = final_top_k;
-	}
+	this->graph.get_algo_topk_results<int, double>(this->HITS_authority, this->top_k, this->authority_topk); // DEVI CAMBIARE IN <INT, DOUBLE>
 }
+
 
 // Function that gets the top-k nodes w.r.t. the hub score
 void HITS::get_topk_hub() {
-	std::vector<std::pair<int, double>> HITS_hub_vec_pairs(this->HITS_hub.begin(), this->HITS_hub.end());
-	std::sort(HITS_hub_vec_pairs.begin(), HITS_hub_vec_pairs.end(), compareBySecondDecreasing<int, double>);
-
-	for(int k : this->top_k) {
-		std::vector<std::pair<int, double>> final_top_k(HITS_hub_vec_pairs.begin(), HITS_hub_vec_pairs.begin() + k);
-		this->hub_topk[k] = final_top_k;
-	}
+	this->graph.get_algo_topk_results<int, double>(this->HITS_hub, this->top_k, this->hub_topk); // DEVI CAMBIARE IN <INT, DOUBLE>
 }
+
 
 // Function that prints the content of the authority vector
 void HITS::print_authority(){
@@ -283,6 +277,7 @@ void HITS::print_authority(){
 	std::cout << "]\n";
 }
 
+
 // Function that prints the content of the hub vector
 void HITS::print_hub(){
 	std::cout << "Values of h_k = [";
@@ -292,30 +287,21 @@ void HITS::print_hub(){
 	std::cout << "]\n";
 }
 
+
 // Function that prints the authority scores for the top-k nodes
 void HITS::print_topk_authority() {
 	std::cout << "Authority scores" << std::endl;
-	for (auto p : this->authority_topk){
-		std::cout << "Top " << p.first << std::endl;
-		int i = 1;
-		for (auto node : p.second) {
-			std::cout << i << ") Node ID: " << node.first << " - Authority score: " << node.second << std::endl;
-			i++;
-		}
-	}
+
+	this->graph.print_algo_topk_results<double>(this->authority_topk, this->autority_str); // CAMBIA AD INT
 }
+
 
 // Function that prints the hub scores for the top-k nodes
 void HITS::print_topk_hub() {
 	std::cout << "Hub scores" << std::endl;
-	for (auto p : this->hub_topk){
-		std::cout << "Top " << p.first << std::endl;
-		int i = 1;
-		for (auto node : p.second) {
-			std::cout << i << ") Node ID: " << node.first << " - Hub score: " << node.second << std::endl;
-			i++;
-		}
-	}
+
+	this->graph.print_algo_topk_results<double>(this->hub_topk, this->hub_str); // CAMBIA AD INT
+
 }
 
 // Function that prints the execution time and the number of steps taken by the HITS algorithm to converge

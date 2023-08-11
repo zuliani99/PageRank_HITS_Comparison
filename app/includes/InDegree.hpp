@@ -16,6 +16,7 @@ class InDegree {
 
 		std::vector<int> top_k;
 		top_k_results<int> IN_topk;
+		std::string algo_str = "In Degree"; 
 		std::unordered_map<int, int> In_Deg_Prestige;
 		Duration elapsed;
 
@@ -28,6 +29,7 @@ class InDegree {
 		Graph graph;
 };
 
+
 void InDegree::compute() {
 	auto start = now();
 	for(int i = 0; i < this->graph.edges; i++) {
@@ -38,27 +40,16 @@ void InDegree::compute() {
 	this->elapsed = now() - start;
 }
 
-void InDegree::get_topk_results() {
-	std::vector<std::pair<int, int>> in_deg_vec_pairs(this->In_Deg_Prestige.begin(), this->In_Deg_Prestige.end());
-	std::sort(in_deg_vec_pairs.begin(), in_deg_vec_pairs.end(), compareBySecondDecreasing<int, int>);
 
-	for(int k : this->top_k) {
-		std::vector<std::pair<int, int>> final_top_k(in_deg_vec_pairs.begin(), in_deg_vec_pairs.begin() + k);
-		this->IN_topk[k] = final_top_k;
-	}
+void InDegree::get_topk_results() {
+	this->graph.get_algo_topk_results<int, int>(this->In_Deg_Prestige, this->top_k, this->IN_topk);
 	this->graph.freeMemory();
 
 }
 
+
 void InDegree::print_topk_results() {
-	for (auto p : this->IN_topk){
-		std::cout << "Top " << p.first << std::endl;
-		int i = 1;
-		for (auto node : p.second) {
-			std::cout << i << ") Node ID: " << node.first << " - In Degree value: " << node.second << std::endl;
-			i++;
-		}
-	}
+	this->graph.print_algo_topk_results<int>(this->IN_topk, this->algo_str);
 }
 
 void InDegree::print_stats() {

@@ -27,6 +27,12 @@ class Graph {
 
 		void freeMemory();
 
+        template<typename T, typename D>
+        void get_algo_topk_results(std::unordered_map<T, D> iter, std::vector<int>& top_k, top_k_results<D>& algo_topk);
+
+        template<typename D>
+        void print_algo_topk_results(top_k_results<D>& algo_topk, std::string& algo_str);
+
 	private:
 		std::string ds_path;
 		void set_nodes_edges(const std::string& ds_path);
@@ -34,6 +40,7 @@ class Graph {
 		std::vector<int> parseLine(const std::string& line);
 		void updateMinMaxNodes(const std::vector<int>& pair);
 };
+
 
 // Function that reads the file and gets the number of nodes and edges from the description
 void Graph::set_nodes_edges(const std::string& ds_path) { 
@@ -57,6 +64,7 @@ void Graph::set_nodes_edges(const std::string& ds_path) {
     }
 }
 
+
 // Function that parses the string line
 std::vector<int> Graph::parseLine(const std::string& line) {
     std::istringstream line_stream(line);
@@ -70,6 +78,7 @@ std::vector<int> Graph::parseLine(const std::string& line) {
     return pair;
 }
 
+
 // Function that updates the minimum and maximum node given a pair of nodes
 void Graph::updateMinMaxNodes(const std::vector<int>& pair) {
     if (pair[0] < this->min_node)
@@ -82,6 +91,7 @@ void Graph::updateMinMaxNodes(const std::vector<int>& pair) {
     if (pair[1] > this->max_node)
         this->max_node = pair[1];
 }
+
 
 // Function that allocates permanent memory 
 void Graph::allocate_memory() {
@@ -109,10 +119,38 @@ void Graph::allocate_memory() {
     file.close();
 }
 
+
 // Function that frees the permanent memory
 void Graph::freeMemory() {
 	if (munmap(this->np_pointer, this->edges) != 0)
     	throw std::runtime_error("Free memory failed\n");
+}
+
+
+
+template<typename T, typename D>
+void Graph::get_algo_topk_results(std::unordered_map<T, D> iter, std::vector<int>& topk, top_k_results<D>& algo_topk) {
+
+    std::vector<std::pair<T, D>> pairs(iter.begin(), iter.end());
+	std::sort(pairs.begin(), pairs.end(), compareBySecondDecreasing<T, D>);
+
+	for(int k : topk) {
+		std::vector<std::pair<T, D>> final_top_k(pairs.begin(), pairs.begin() + k);
+		algo_topk[k] = final_top_k;
+	}
+}
+
+
+template<typename D>
+void Graph::print_algo_topk_results(top_k_results<D>& algo_topk, std::string& algo_str) {
+	for (auto p : algo_topk){
+		std::cout << "Top " << p.first << std::endl;
+		int i = 1;
+		for (auto node : p.second) {
+			std::cout << i << ") Node ID: " << node.first << " - " + algo_str + " value: " << node.second << std::endl;
+			i++;
+		}
+	}
 }
 
 #endif
