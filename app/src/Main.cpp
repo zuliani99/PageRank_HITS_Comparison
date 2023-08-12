@@ -4,9 +4,9 @@
 #include "../includes/Jaccard.hpp"
 
 int main(){
-	std::vector<std::string> datasets = {"../dataset/web-NotreDame.txt"};
-	// std::vector<std::string> datasets = {"../dataset/test-dataset.txt"};
-	std::vector<int> top_k = {10};//, 20, 30, 40, 50};
+	//std::vector<std::string> datasets = {"../dataset/web-NotreDame.txt"};
+	std::vector<std::string> datasets = {"../dataset/test-dataset.txt"};
+	std::vector<int> top_k = {5};//, 20, 30, 40, 50};
 
 	for (auto ds : datasets) {
 		std::cout << "-------------------" << ds << "---------------------" << std::endl;
@@ -36,6 +36,7 @@ int main(){
 		hits.print_stats();
 		hits.get_topk_hub();
 		hits.get_topk_authority();
+		std::cout << std::endl;
 		hits.print_topk_hub();
 		std::cout << std::endl;
 		hits.print_topk_authority();

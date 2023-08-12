@@ -37,7 +37,6 @@ class PageRank {
 
 		// vector that store the row pointer and to node id of each edge 
 		std::vector<std::pair<int, int>> row_pointers; 
-		//std::vector<int> row_pointers; 
 
 		void set_card_map_and_dan_node();
 		void add_danglings(int start, int end);
@@ -47,14 +46,14 @@ class PageRank {
 };
 
 
-// OK
+
 void PageRank::add_danglings(int start, int end) {
 	for (int dan = start + 1; dan <= end - 1; dan++)
 		this->dangling_nodes.push_back(dan);
 }
 
 
-// OK
+
 void PageRank::set_card_map_and_dan_node(){
 	int predecessor = -1;
 	int cardinality = 0;
@@ -85,7 +84,7 @@ void PageRank::set_card_map_and_dan_node(){
 	this->cardinality_map[predecessor] = cardinality;
 
 
-	std::cout << "Cardinality\n";
+	/*std::cout << "Cardinality\n";
 	for(int i = 0; i < this->cardinality_map.size(); i++) {
 		std::cout << i << " " << this->cardinality_map[i] << std::endl;
 	}
@@ -95,7 +94,7 @@ void PageRank::set_card_map_and_dan_node(){
 	for(int i = 0; i < this->dangling_nodes.size(); i++) {
 		std::cout << this->dangling_nodes[i] << std::endl;
 	}
-	std::cout << std::endl;
+	std::cout << std::endl;*/
 }
 
 
@@ -104,11 +103,13 @@ void PageRank::set_T_matrix() {
 
 	// Sort the sequence of pair of points by the second element by increasingly oder
 	std::stable_sort(this->graph.np_pointer, this->graph.np_pointer + this->graph.edges, compareBySecondIncreasing);
-	std::cout << "sorting by increasing order of the second element\n";
+
+	/*std::cout << "sorting by increasing order of the second element\n";
 	for(int i = 0; i < this->graph.edges; i++) {
 		std::cout << this->graph.np_pointer[i].first << " " << this->graph.np_pointer[i].second << std::endl;
 	}
-	std::cout << std::endl;
+	std::cout << std::endl;*/
+
 
     this->pt_traspose = (traspose_pair*)mmap(NULL, this->graph.edges * sizeof(traspose_pair), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
 	if (this->pt_traspose == MAP_FAILED)
@@ -128,14 +129,15 @@ void PageRank::set_T_matrix() {
 	this->row_pointers.push_back(std::make_pair(-1, -1)); // to notify the conclusion of out transpose matrix
 	this->graph.freeMemory();
 
-	for(int i = 0; i < this->graph.edges; i++) {
+
+	/*for(int i = 0; i < this->graph.edges; i++) {
 		std::cout << this->pt_traspose[i].first << " " << this->pt_traspose[i].second << std::endl;
 	}
 	std::cout << std::endl;
 
 	for(int i = 0; i < this->row_pointers.size(); i++) {
 		std::cout << this->row_pointers[i].first << " " << this->row_pointers[i].second << std::endl;
-	}
+	}*/
 
 }
 
@@ -157,18 +159,24 @@ void PageRank::compute() {
 		}
 
 		int row_ptr = 0;
-		int new_row_ptr = this->row_pointers[1].first;  
+		int next_row_ptr = this->row_pointers[row_ptr + 1].first;  
 
 		// A^t * P_k
 		for(int i = 0; i < this->graph.edges; i++) {
-			if(i == new_row_ptr){
+			if(i == next_row_ptr){
 				row_ptr++;
-				new_row_ptr = this->row_pointers[row_ptr + 1].first;
+				next_row_ptr = this->row_pointers[row_ptr + 1].first;
 			}
+
 			// I have to update the same untill I change row, I'm considereing the to node id
+			// Here is done the actual matrix moltiplication between the transpose matrix #edges x #edges times the PR column vector #edges x 1
+			// So the summation between all the moltiplication of the elements of a given row and the element of the column vector
+
 			current_PR_Prestige[this->row_pointers[row_ptr].second] += this->pt_traspose[i].first * this->PR_Prestige[this->pt_traspose[i].second];
 		}
 
+		for (int i = 0; i < this->graph.edges; i++)	
+			current_PR_Prestige[i] = ((dangling_Pk + current_PR_Prestige[i]) * this->t_prob) + (1 - this->t_prob) / this->graph.nodes;
 
 		this->steps++;
 
@@ -179,7 +187,7 @@ void PageRank::compute() {
 }
 
 
-// OK
+
 bool PageRank::converge(std::unordered_map<int, double> &temp_Pk) {
 	double distance = 0.;
 
@@ -195,65 +203,20 @@ bool PageRank::converge(std::unordered_map<int, double> &temp_Pk) {
 }
 
  
-// OK
+
 void PageRank::get_topk_results() {
 	this->graph.get_algo_topk_results<int, double>(this->PR_Prestige, this->top_k, this->PR_topk);
 }
 
 
-// OK
+
 void PageRank::print_topk_results() {
 	this->graph.print_algo_topk_results<double>(this->PR_topk, this->algo_str);
 }
 
 
-// OK
+
 void PageRank::print_stats() {
 	std::cout << "Elapsed: " << this->elapsed.count() << " ms \t Steps: "<< this->steps << std::endl;
 }
 
-
-
-
-
-
-/*
-
-// CAPIRE SE VA BENE E MODIFICARE IN CASO
-void PageRank::compute() {
-
-	std::unordered_map<int, double> current_PR_Prestige;
-	for (int i = 0; i < this->graph.nodes; i++) current_PR_Prestige[i] = 1. / this->graph.nodes;
-
-	auto start = now();
-
-	do {
-		double dangling_Pk = 0.;
-		int temp_row_pt = 0;
-		int temp_nexr_row_pt = this->row_pointers[1].first;
-
-		this->steps++;
-
-		// A^T * P_k
-		for (int i = 0; i < this->graph.edges; i++) {
-			if (i == temp_nexr_row_pt) {
-				temp_row_pt++;
-				temp_nexr_row_pt = this->row_pointers[temp_row_pt + 1].first;
-			}
-
-			current_PR_Prestige[this->row_pointers[temp_row_pt].second] += this->pt_traspose[i].first * this->PR_Prestige[this->pt_traspose[i].second];
-		}
-
-		// Dangling * 1/n * P_k
-        for (int dang_id : this->dangling_nodes)
-            dangling_Pk += this->PR_Prestige[dang_id - this->graph.min_node] * (1. / this->graph.nodes);
-
-		for (int i = 0; i < this->graph.edges; i++)
-			current_PR_Prestige[i] = ((dangling_Pk + current_PR_Prestige[i]) * this->t_prob) + (1 - this->t_prob) / this->graph.nodes;
-
-	} while(this->converge(current_PR_Prestige));
-
-	this->elapsed = now() - start;
-
-}
-*/
