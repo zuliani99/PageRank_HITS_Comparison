@@ -6,6 +6,7 @@
 #include "./Utils.hpp"
 #include <sstream>
 
+// Class that describe the general bheaviour that a graph has, with relative generic fucntion
 class Graph {
 	public:
 		// Default constructor
@@ -16,14 +17,16 @@ class Graph {
 			this->ds_path = ds_path;
 			this->set_nodes_edges(ds_path);
 			this->allocate_memory();
-			//std::cout << "Nodes: " << this->nodes << " - Edges: " << this->edges << " - Max Node: " << this->max_node << " - Min Node: " << this->min_node << std::endl;
 		}
         
 		int nodes;
 		int edges;
 		int min_node = INT32_MAX;
 		int max_node = 0;
-		nodes_pair* np_pointer;
+		nodes_pair* np_pointer; // Declere the pointer of nodes_pair to start memorizing edges
+
+
+		// Public fucntion declaration
 
 		void freeMemory();
 
@@ -35,9 +38,11 @@ class Graph {
 
 	private:
 		std::string ds_path;
+		std::vector<int> parseLine(const std::string& line);
+
+		// Private function declaration
 		void set_nodes_edges(const std::string& ds_path);
 		void allocate_memory();
-		std::vector<int> parseLine(const std::string& line);
 		void updateMinMaxNodes(const std::vector<int>& pair);
 };
 
@@ -71,9 +76,8 @@ std::vector<int> Graph::parseLine(const std::string& line) {
     std::string str;
     std::vector<int> pair;
     
-    while (std::getline(line_stream, str, '\t')) {
+    while (std::getline(line_stream, str, '\t'))
         pair.push_back(std::stoi(str));
-    }
     
     return pair;
 }
@@ -127,7 +131,7 @@ void Graph::freeMemory() {
 }
 
 
-
+// Generic function to obtain the top_k nodes of a given algorithm
 template<typename T, typename D>
 void Graph::get_algo_topk_results(std::unordered_map<T, D> iter, std::vector<int>& topk, top_k_results<D>& algo_topk) {
 
@@ -135,12 +139,13 @@ void Graph::get_algo_topk_results(std::unordered_map<T, D> iter, std::vector<int
 	std::sort(pairs.begin(), pairs.end(), compareBySecondDecreasing<T, D>);
 
 	for(int k : topk) {
-		std::vector<std::pair<T, D>> final_top_k(pairs.begin(), pairs.begin() + k);
+		std::vector<std::pair<T, D>> final_top_k(pairs.begin(), pairs.begin() + k); 
 		algo_topk[k] = final_top_k;
 	}
 }
 
 
+// Generic function to print the top_k nodes of a given algorithm
 template<typename D>
 void Graph::print_algo_topk_results(top_k_results<D>& algo_topk, std::string& algo_str) {
 	for (auto p : algo_topk){
