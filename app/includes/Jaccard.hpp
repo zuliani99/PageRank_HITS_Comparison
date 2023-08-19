@@ -6,14 +6,14 @@
 class JaccardCoefficient {
 	public: 
 		JaccardCoefficient(std::vector<int> topk, top_k_results<int> &ID_topk, 
-					top_k_results<double> &PR_topk, top_k_results<int> &HITS_authority_topk, top_k_results<int> &HITS_hub_topk) {
+					top_k_results<double> &PR_topk, top_k_results<double> &HITS_authority_topk, top_k_results<double> &HITS_hub_topk) {
 			this->topk = topk;
 
 			// Get the IDs of the top_k nodes for each top_k results for all the algorithms
 			this->nodes_ID_topk = this->get_first_element_vector<int>(ID_topk);
 			this->nodes_PR_topk = this->get_first_element_vector<double>(PR_topk);
-			this->nodes_HITS_authority_topk = this->get_first_element_vector<int>(HITS_authority_topk);
-			this->nodes_HITS_hub_topk = this->get_first_element_vector<int>(HITS_hub_topk);			
+			this->nodes_HITS_authority_topk = this->get_first_element_vector<double>(HITS_authority_topk);
+			this->nodes_HITS_hub_topk = this->get_first_element_vector<double>(HITS_hub_topk);			
 		}
 
 		// Public fucntion declaration

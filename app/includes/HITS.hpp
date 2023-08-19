@@ -27,16 +27,16 @@ class HITS {
     	// std::vector<double> h_k;
 
 		// Map: NodeID <-> authority score
-		std::unordered_map<int, int> HITS_authority;
+		std::unordered_map<int, double> HITS_authority;
 
 		// Map: NodeID <-> hub score
-		std::unordered_map<int, int> HITS_hub;
+		std::unordered_map<int, double> HITS_hub;
 
 		// Vector containing the final top-k authority scores
-		top_k_results<int> authority_topk;
+		top_k_results<double> authority_topk;
 
 		// Vector containing the final top-k hub scores
-		top_k_results<int> hub_topk;
+		top_k_results<double> hub_topk;
 		
 		// Number of steps for convergence
 		int steps = 0;
@@ -82,9 +82,8 @@ class HITS {
 		std::string autority_str = "Authority"; 
 		std::string hub_str = "Hub"; 
 
-		bool converge_authority(std::unordered_map<int, int> &temp);
-		bool converge_hub(std::unordered_map<int, int> &temp);
-		void normalize(std::unordered_map<int, int> &ak, std::unordered_map<int, int> &hk);
+		bool converge(std::unordered_map<int, double> &temp_a, std::unordered_map<int,double> &temp_h);
+		void normalize(std::unordered_map<int, double> &ak, std::unordered_map<int, double> &hk);
 };
 
 // Function that computes the adjacency matrix L
@@ -141,7 +140,7 @@ void HITS::create_L_and_L_t(){
 	std::stable_sort(this->graph.np_pointer, this->graph.np_pointer + this->graph.edges, compareByFirstIncreasing);
 	this->compute_L();
 
-	// Sorting again w.r.t. second element 
+	// Sorting again w.r.t. the second element 
 	std::stable_sort(this->graph.np_pointer, this->graph.np_pointer + this->graph.edges, compareBySecondIncreasing);
 	this->compute_L_t();
 
@@ -159,12 +158,11 @@ void HITS::initialize_ak_hk(){
 void HITS::compute(){
     this->steps = 0;
 
-    std::unordered_map<int, int> temp_HITS_authority;
-	for (int i = 0; i < this->graph.nodes; i++) temp_HITS_authority[i] = 1;
-	std::unordered_map<int, int> temp_HITS_hub;
-	for (int i = 0; i < this->graph.nodes; i++) temp_HITS_hub[i] = 1;
+    std::unordered_map<int, double> temp_HITS_authority;
+	for (int i = 0; i < this->graph.nodes; i++) temp_HITS_authority[i] = 1.;
+	std::unordered_map<int, double> temp_HITS_hub;
+	for (int i = 0; i < this->graph.nodes; i++) temp_HITS_hub[i] = 1.;
 
-    bool first_cicle = true;
 	auto start = now();
 
     do {
@@ -178,13 +176,7 @@ void HITS::compute(){
                 tmp_pos_row++;
                 next_starting_row = this->row_ptr_L[tmp_pos_row + 1];
             }
-			// TODO: check if togliendo first_cicle è uguale..
-            if (first_cicle){
-                temp_HITS_hub[this->row_ptr_not_empty_L[tmp_pos_row]] += 1;
-            }
-            else{
-                temp_HITS_hub[this->row_ptr_not_empty_L[tmp_pos_row]] += this->HITS_hub[this->L_ptr[i]];
-            }
+            temp_HITS_hub[this->row_ptr_not_empty_L[tmp_pos_row]] += this->HITS_hub[this->L_ptr[i]];
         }
 
     	// Computing authority scores at time 1
@@ -195,54 +187,40 @@ void HITS::compute(){
                 tmp_pos_row++;
                 next_starting_row = this->row_ptr_L_t[tmp_pos_row + 1];
             }
-			// TODO: check if togliendo first_cicle è uguale..
-            if (first_cicle){
-                temp_HITS_authority[this->row_ptr_not_empty_L_t[tmp_pos_row]] += 1;
-            }
-            else{
-                temp_HITS_authority[this->row_ptr_not_empty_L_t[tmp_pos_row]] += this->HITS_authority[this->L_t_ptr[i]];
-            }
-        }
-        if (first_cicle){
-            first_cicle = false;
+            temp_HITS_authority[this->row_ptr_not_empty_L_t[tmp_pos_row]] += this->HITS_authority[this->L_t_ptr[i]];
         }
         this->normalize(temp_HITS_authority, temp_HITS_hub);
-    } while (this->converge_authority(temp_HITS_authority) and this->converge_hub(temp_HITS_hub));
+    } while (this->converge(temp_HITS_authority, temp_HITS_hub));
 	this->elapsed = now() - start;
 }
 
-// TODO: converge unica
+// Function that establishes whether the execution of the HITS algorithm should continue or not
+bool HITS::converge(std::unordered_map<int, double> &temp_a, std::unordered_map<int,double> &temp_h){
+	double distance_a = 0.;
+	double distance_h = 0.;
 
-// Function that establishes whether the execution of the HITS algorithm should continue or not 
-bool HITS::converge_authority(std::unordered_map<int, int> &temp){
-	double distance = 0.;
-	for (int i = 0; i < temp.size(); i++) 
-		distance += std::abs(this->HITS_authority[i] - temp[i]);
+	for (int i = 0; i < temp_a.size(); i++) 
+		distance_a += std::abs(this->HITS_authority[i] - temp_a[i]);
 
-	this->HITS_authority = temp;
+	for (int i = 0; i < temp_h.size(); i++) 
+		distance_h += std::abs(this->HITS_hub[i] - temp_h[i]);
 
-	temp.clear();
-	for (int i = 0; i < this->graph.nodes; i++) temp[i] = 1;
+	this->HITS_authority = temp_a;
+	this->HITS_hub = temp_h;
 
-	return distance > std::pow(10, -6);
+	temp_a.clear();
+	temp_h.clear();
+
+	for (int i = 0; i < this->graph.nodes; i++) temp_a[i] = 1.;
+	for (int i = 0; i < this->graph.nodes; i++) temp_h[i] = 1.;
+
+	return distance_a > std::pow(10, -6) and distance_h > std::pow(10,-6);
+
 }
 
-// Function that establishes whether the execution of the HITS algorithm should continue or not 
-bool HITS::converge_hub(std::unordered_map<int, int> &temp){
-	double distance = 0.;
-	for (int i = 0; i < temp.size(); i++) 
-		distance += std::abs(this->HITS_hub[i] - temp[i]);
-
-	this->HITS_hub = temp;
-
-	temp.clear();
-	for (int i = 0; i < this->graph.nodes; i++) temp[i] = 1;
-
-	return distance > std::pow(10, -6);
-}
 
 // Function that normalizes the vectors in order to obtain a probability distribution
-void HITS::normalize(std::unordered_map<int, int> &ak, std::unordered_map<int, int> &hk){
+void HITS::normalize(std::unordered_map<int, double> &ak, std::unordered_map<int, double> &hk){
 	double sum_a_k = 0.0;
 	double sum_h_k = 0.0;
 	
@@ -260,13 +238,13 @@ void HITS::normalize(std::unordered_map<int, int> &ak, std::unordered_map<int, i
 
 // Function that gets the top-k nodes w.r.t. the authority score
 void HITS::get_topk_authority() {
-	this->graph.get_algo_topk_results<int, int>(this->HITS_authority, this->top_k, this->authority_topk); 
+	this->graph.get_algo_topk_results<int, double>(this->HITS_authority, this->top_k, this->authority_topk); 
 }
 
 
 // Function that gets the top-k nodes w.r.t. the hub score
 void HITS::get_topk_hub() {
-	this->graph.get_algo_topk_results<int, int>(this->HITS_hub, this->top_k, this->hub_topk); 
+	this->graph.get_algo_topk_results<int, double>(this->HITS_hub, this->top_k, this->hub_topk); 
 }
 
 
@@ -294,7 +272,7 @@ void HITS::print_hub(){
 void HITS::print_topk_authority() {
 	std::cout << "Authority scores" << std::endl;
 
-	this->graph.print_algo_topk_results<int>(this->authority_topk, this->autority_str); 
+	this->graph.print_algo_topk_results<double>(this->authority_topk, this->autority_str); 
 }
 
 
@@ -302,7 +280,7 @@ void HITS::print_topk_authority() {
 void HITS::print_topk_hub() {
 	std::cout << "Hub scores" << std::endl;
 
-	this->graph.print_algo_topk_results<int>(this->hub_topk, this->hub_str); 
+	this->graph.print_algo_topk_results<double>(this->hub_topk, this->hub_str); 
 
 }
 
