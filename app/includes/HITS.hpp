@@ -46,6 +46,7 @@ class HITS {
 		
 		void compute_L();
 		void compute_L_t();
+		void compute_LLt();
 		void create_L_and_L_t();
 		void initialize_ak_hk();
 		void compute();
@@ -70,6 +71,7 @@ class HITS {
 		// Stores the empty line in L
     	std::vector<unsigned int> row_ptr_not_empty_L;
 
+
 		// Stores the transpose of the adjacency matrix L storing the column position
     	unsigned int* L_t_ptr;
 
@@ -79,12 +81,21 @@ class HITS {
     	// Stores the empty line in L_t
     	std::vector<unsigned int> row_ptr_not_empty_L_t;
 
+
+    	unsigned int* LLt_ptr;
+    	std::vector<unsigned int> row_ptr_LLt;
+    	std::vector<unsigned int> row_ptr_not_empty_LLt;
+		unsigned int len_LLt;
+
+
+
 		std::string autority_str = "Authority"; 
 		std::string hub_str = "Hub"; 
 
 		bool converge(std::unordered_map<int, double> &temp_a, std::unordered_map<int,double> &temp_h);
 		void normalize(std::unordered_map<int, double> &ak, std::unordered_map<int, double> &hk);
 };
+
 
 // Function that computes the adjacency matrix L
 void HITS::compute_L(){
@@ -97,18 +108,30 @@ void HITS::compute_L(){
 	}
 
 	this->row_ptr_L.push_back(0);
-	this->row_ptr_not_empty_L.push_back(this->graph.np_pointer[0].first - this->graph.min_node);
+	this->row_ptr_not_empty_L.push_back(this->graph.np_pointer[0].first); // - this->graph.min_node
 
 	// Computing L
 	for (unsigned int i = 0; i < this->graph.edges; i++){
 		if (i > 0 && this->graph.np_pointer[i - 1].first != this->graph.np_pointer[i].first){
-			row_ptr_L.push_back(i);
-			this->row_ptr_not_empty_L.push_back(this->graph.np_pointer[i].first - this->graph.min_node);
+			this->row_ptr_L.push_back(i);
+			this->row_ptr_not_empty_L.push_back(this->graph.np_pointer[i].first); // - this->graph.min_node
 		}
 		this->L_ptr[i] = this->graph.np_pointer[i].second;
 	}
 	this->row_ptr_L.push_back(this->graph.edges);
+
+
+	/*for(int i = 0; i < this->graph.edges; i++) {
+		std::cout << this->L_ptr[i] << std::endl;
+	}
+	std::cout << std::endl;
+
+	for(int i = 0; i < this->row_ptr_not_empty_L.size(); i++) {
+		std::cout << this->row_ptr_L[i] << " " << this->row_ptr_not_empty_L[i] << std::endl;
+	}
+	std::cout << std::endl;*/
 }
+
 
 // Function that computes the transpose matrix of L
 void HITS::compute_L_t(){
@@ -121,38 +144,132 @@ void HITS::compute_L_t(){
 	}
 
 	this->row_ptr_L_t.push_back(0);
-	this->row_ptr_not_empty_L_t.push_back(this->graph.np_pointer[0].second - this->graph.min_node);
+	this->row_ptr_not_empty_L_t.push_back(this->graph.np_pointer[0].second); // - this->graph.min_node
 	
 	// Computing L_t
 	for (unsigned int i = 0; i < this->graph.edges; i++){
 		if (i > 0 && this->graph.np_pointer[i - 1].second != this->graph.np_pointer[i].second){
 			row_ptr_L_t.push_back(i);
-			this->row_ptr_not_empty_L_t.push_back(this->graph.np_pointer[i].second - this->graph.min_node);
+			this->row_ptr_not_empty_L_t.push_back(this->graph.np_pointer[i].second); // - this->graph.min_node
 		}
 		this->L_t_ptr[i] = this->graph.np_pointer[i].first;
 	}
 	this->row_ptr_L_t.push_back(this->graph.edges);
+
+
+	/*for(int i = 0; i < this->graph.edges; i++) {
+		std::cout << this->L_t_ptr[i] << std::endl;
+	}
+	std::cout << std::endl;
+
+	for(int i = 0; i < this->row_ptr_not_empty_L_t.size(); i++) {
+		std::cout << this->row_ptr_L_t[i] << " " << this->row_ptr_not_empty_L_t[i] << std::endl;
+	}
+	std::cout << std::endl;*/
 }
+
+
+void HITS::compute_LLt() {
+	// Allocating the right amount of space in permanent memory to save the edges of graph as a set of pairs
+	this->LLt_ptr = (unsigned int*)mmap(NULL, this->graph.nodes * this->graph.nodes * sizeof(unsigned int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
+	
+	// Checking the allocation
+	if (this->LLt_ptr == MAP_FAILED){
+		throw std::runtime_error("Mapping failed\n");
+	}
+	
+	int c = 0;
+
+	this->row_ptr_not_empty_LLt = this->row_ptr_not_empty_L;
+
+
+
+
+	for (unsigned int r = 0; r <= this->row_ptr_L.size() - 2; r++){
+		std::cout << "row_ptr_L " << this->row_ptr_L[r] << std::endl; 
+
+		this->row_ptr_LLt.push_back(c);
+		std::vector<unsigned int> temp_col_idx;
+
+		std::cout << "temp_col_idx" << std::endl;
+		for(int i = this->row_ptr_L[r]; i < this->row_ptr_L[r + 1]; i ++) {
+			temp_col_idx.push_back(this->L_ptr[i]);
+			std::cout << temp_col_idx[i] << std::endl;
+		}
+		std::cout << std::endl;
+
+		
+
+		for(int jump = 0; jump <= this->row_ptr_L.size() - 2; jump ++){
+			unsigned int temp_LLt = 0;
+			std::cout << "jump " << jump << std::endl;
+
+			for(unsigned int j = this->row_ptr_L[jump]; j < this->row_ptr_L[jump + 1]; j ++) {
+				std::cout << "checling the presence of " << this->L_ptr[j] <<std::endl;
+
+				if(std::find(temp_col_idx.begin(), temp_col_idx.end(), this->L_ptr[j]) != temp_col_idx.end()){
+					temp_LLt += 1;
+					std::cout << "found " << this->L_ptr[j] << " now is " << temp_LLt << std::endl;
+				}
+			}
+
+		 	std::cout << "temp_LLt in " << c << " will be: " << temp_LLt << std::endl;
+			if(temp_LLt > 0) {
+				this->LLt_ptr[c] = temp_LLt;
+				c += 1;
+				this->row_ptr_LLt.push_back(c);
+			}
+
+		}
+		
+
+		//if(jump + 1 < this->row_ptr_L.size() - 1)
+		//	jump += 1;
+		
+	}
+	this->len_LLt = c;
+
+}
+
 
 // Function that creates L and L_t
 void HITS::create_L_and_L_t(){
 	// Sorting ptr with a stable sort w.r.t. the first column, in this way we are able to compute the affinity matrix
 	std::stable_sort(this->graph.np_pointer, this->graph.np_pointer + this->graph.edges, compareByFirstIncreasing);
+	for(int i = 0; i < this->graph.edges; i++) {
+		std::cout << this->graph.np_pointer[i].first << " " << this->graph.np_pointer[i].second << std::endl;
+	}
+	std::cout << std::endl;
+
+
 	this->compute_L();
 
 	// Sorting again w.r.t. the second element 
 	std::stable_sort(this->graph.np_pointer, this->graph.np_pointer + this->graph.edges, compareBySecondIncreasing);
+	for(int i = 0; i < this->graph.edges; i++) {
+		std::cout << this->graph.np_pointer[i].first << " " << this->graph.np_pointer[i].second << std::endl;
+	}
+	std::cout << std::endl;
 	this->compute_L_t();
+
+
+	this->compute_LLt();
+	std::cout << "compute_LLt" <<std::endl;
+	for(unsigned int i = 0; i < this->len_LLt; i++) {
+		std::cout << i << " " << this->LLt_ptr[i] << std::endl;
+	}
 
 	// Free memory 
 	this->graph.freeMemory();
 }
+
 
 // Function that initializes authority and hub vectors
 void HITS::initialize_ak_hk(){
 	for (int i = 0; i < this->graph.nodes; i++) this->HITS_authority[i] = 1.;
 	for (int i = 0; i < this->graph.nodes; i++) this->HITS_hub[i] = 1.;
 }
+
 
 // Function that computes autority and hub vectors
 void HITS::compute(){
@@ -176,7 +293,7 @@ void HITS::compute(){
                 tmp_pos_row++;
                 next_starting_row = this->row_ptr_L[tmp_pos_row + 1];
             }
-            temp_HITS_hub[this->row_ptr_not_empty_L[tmp_pos_row]] += this->HITS_hub[this->L_ptr[i]];
+            temp_HITS_hub[this->row_ptr_not_empty_L[tmp_pos_row]] += this->HITS_authority[this->L_ptr[i]];
         }
 
     	// Computing authority scores at time 1
@@ -187,7 +304,7 @@ void HITS::compute(){
                 tmp_pos_row++;
                 next_starting_row = this->row_ptr_L_t[tmp_pos_row + 1];
             }
-            temp_HITS_authority[this->row_ptr_not_empty_L_t[tmp_pos_row]] += this->HITS_authority[this->L_t_ptr[i]];
+            temp_HITS_authority[this->row_ptr_not_empty_L_t[tmp_pos_row]] += this->HITS_hub[this->L_t_ptr[i]];
         }
         this->normalize(temp_HITS_authority, temp_HITS_hub);
     } while (this->converge(temp_HITS_authority, temp_HITS_hub));
@@ -283,6 +400,7 @@ void HITS::print_topk_hub() {
 	this->graph.print_algo_topk_results<double>(this->hub_topk, this->hub_str); 
 
 }
+
 
 // Function that prints the execution time and the number of steps taken by the HITS algorithm to converge
 void HITS::print_stats() {

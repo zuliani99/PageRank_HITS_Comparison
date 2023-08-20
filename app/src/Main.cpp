@@ -6,7 +6,7 @@
 int main(){
 	//std::vector<std::string> datasets = {"../dataset/web-NotreDame.txt"};
 	std::vector<std::string> datasets = {"../dataset/test-dataset.txt"};
-	std::vector<int> top_k = {5};//, 20, 30, 40, 50};
+	std::vector<int> top_k = {5};//, 10, 20, 30};
 
 	for (auto ds : datasets) {
 		std::cout << "-------------------" << ds << "---------------------" << std::endl;
