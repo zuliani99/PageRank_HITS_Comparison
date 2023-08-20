@@ -304,29 +304,35 @@ void HITS::compute(){
     do {
         this->steps++;
 
-        // Computing hub scores at time 1
-        unsigned int tmp_pos_row = 0;
-        unsigned int next_starting_row = this->row_ptr_L[1];
-        for (unsigned int i = 0; i < this->graph.edges; i++){
-            if (i == next_starting_row){
-                tmp_pos_row++;
-                next_starting_row = this->row_ptr_L[tmp_pos_row + 1];
+        // L^t * L * a_k-1
+        unsigned int tmp_pos_row_LtL = 0;
+        unsigned int next_starting_row_LtL = this->row_ptr_LtL[1];
+
+        for (unsigned int i = 0; i < this->len_LtL; i++){
+            if (i == next_starting_row_LtL){
+                tmp_pos_row_LtL++;
+                next_starting_row_LtL = this->row_ptr_LtL[tmp_pos_row_LtL + 1];
             }
-            temp_HITS_hub[this->row_ptr_not_empty_L[tmp_pos_row]] += this->HITS_authority[this->L_ptr[i]];
+            temp_HITS_hub[this->row_ptr_not_empty_LtL[tmp_pos_row_LtL]] += this->LtL_ptr[i] * this->HITS_authority[this->L_ptr[i]];
         }
 
-    	// Computing authority scores at time 1
-        tmp_pos_row = 0;
-        next_starting_row = this->row_ptr_L_t[1];
-        for (unsigned int i = 0; i < this->graph.edges; i++){
-            if (i == next_starting_row){
-                tmp_pos_row++;
-                next_starting_row = this->row_ptr_L_t[tmp_pos_row + 1];
+    	// L * L^t * h_k-1
+        unsigned int tmp_pos_row_LLt = 0;
+        unsigned int next_starting_row_LLt = this->row_ptr_LLt[1];
+
+        for (unsigned int i = 0; i < this->len_LLt; i++){
+            if (i == next_starting_row_LLt){
+                tmp_pos_row_LLt ++;
+                next_starting_row_LLt = this->row_ptr_LLt[tmp_pos_row_LLt + 1];
             }
-            temp_HITS_authority[this->row_ptr_not_empty_L_t[tmp_pos_row]] += this->HITS_hub[this->L_t_ptr[i]];
+            temp_HITS_authority[this->row_ptr_not_empty_LLt[tmp_pos_row_LLt]] += this->HITS_hub[this->L_t_ptr[i]];
         }
+
+
         this->normalize(temp_HITS_authority, temp_HITS_hub);
+
     } while (this->converge(temp_HITS_authority, temp_HITS_hub));
+	
 	this->elapsed = now() - start;
 }
 
