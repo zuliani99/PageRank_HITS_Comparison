@@ -16,7 +16,7 @@ class JaccardCoefficient {
 			this->nodes_HITS_hub_topk = this->get_first_element_vector<double>(HITS_hub_topk);			
 		}
 
-		// Public fucntion declaration
+		// Public function declaration
 		void obtain_results();
 		void print_results();
 
@@ -31,7 +31,7 @@ class JaccardCoefficient {
 		std::map<int, std::vector<std::pair<std::string, double>>> jaccard_results;
 
 
-		// Private fucntion declaration
+		// Private function declaration
 		template<typename T>
 		std::map<int, std::vector<int>> get_first_element_vector(top_k_results<T> &topk_vector);
 
@@ -40,7 +40,7 @@ class JaccardCoefficient {
 };
 
 
-// Fucntion to get the IDs of the top_k nodes for each top_k results
+// Function to get the IDs of the top_k nodes for each top_k results
 template<typename T>
 std::map<int, std::vector<int>> JaccardCoefficient::get_first_element_vector(top_k_results<T> &topk_vector) {
 
@@ -65,6 +65,9 @@ std::map<int, std::vector<int>> JaccardCoefficient::get_first_element_vector(top
 // Function to intersect the two given vectors
 std::vector<int> JaccardCoefficient::intersection(std::vector<int> &v1, std::vector<int> &v2) {
     std::vector<int> intersect;
+
+	std::stable_sort(v1.begin(), v1.end());
+	std::stable_sort(v2.begin(), v2.end());
  
     // Find the intersection of the two sets
     std::set_intersection(v1.begin(), v1.end(), v2.begin(), v2.end(), 
@@ -105,7 +108,7 @@ void JaccardCoefficient::obtain_results() {
 }
 
 
-// Fucntion to print the results
+// Function to print the results
 void JaccardCoefficient::print_results() {
 	for(auto pair1 : this->jaccard_results) {
 		std::cout << "TOP " << pair1.first;

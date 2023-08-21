@@ -1,6 +1,6 @@
 #include "Graph.hpp"
 
-// Class that take into accaunt all the computation of the InDegree algorithm
+// Class that takes into account all the computation of the InDegree algorithm
 class InDegree {
 	public: 
 

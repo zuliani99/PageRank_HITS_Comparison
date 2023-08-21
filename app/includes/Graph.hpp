@@ -6,7 +6,7 @@
 #include "./Utils.hpp"
 #include <sstream>
 
-// Class that describe the general bheaviour that a graph has, with relative generic fucntion
+// Class that describes the general behaviour that a graph has, with relative generic functions
 class Graph {
 	public:
 		// Default constructor
@@ -23,11 +23,10 @@ class Graph {
 		int edges;
 		int min_node = INT32_MAX;
 		int max_node = 0;
-		nodes_pair* np_pointer; // Declere the pointer of nodes_pair to start memorizing edges
+		nodes_pair* np_pointer; // Declare the pointer of nodes_pair to start memorizing edges
 
 
-		// Public fucntion declaration
-
+		// Public functions declaration
 		void freeMemory();
 
         template<typename T, typename D>
@@ -40,7 +39,7 @@ class Graph {
 		std::string ds_path;
 		std::vector<int> parseLine(const std::string& line);
 
-		// Private function declaration
+		// Private functions declaration
 		void set_nodes_edges(const std::string& ds_path);
 		void allocate_memory();
 		void updateMinMaxNodes(const std::vector<int>& pair);
@@ -117,6 +116,7 @@ void Graph::allocate_memory() {
             this->updateMinMaxNodes(pair);
             
             this->np_pointer[i] = nodes_pair(pair[0], pair[1]);
+			// std::cout << "DEBUG: " << "i = " << i << "\nnp_pointer = " << pair[0] << " " << pair[1] << "\n";
             i++;
         }
     }

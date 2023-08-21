@@ -4,9 +4,11 @@
 #include "../includes/Jaccard.hpp"
 
 int main(){
-	//std::vector<std::string> datasets = {"../dataset/web-NotreDame.txt"};
+	// std::vector<std::string> datasets = {"../dataset/web-NotreDame.txt"};
 	std::vector<std::string> datasets = {"../dataset/test-dataset.txt"};
-	std::vector<int> top_k = {5};//, 10, 20, 30};
+	// std::vector<std::string> datasets = {"../dataset/web-BerkStan.txt"};
+	// std::vector<std::string> datasets = {"../dataset/prova.txt"};
+	std::vector<int> top_k = {5}; //, 20, 30, 40, 50};
 
 	for (auto ds : datasets) {
 		std::cout << "-------------------" << ds << "---------------------" << std::endl;

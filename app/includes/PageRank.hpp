@@ -1,7 +1,7 @@
 #include "Graph.hpp"
 #include <cmath>
 
-// Class that take into accaunt all the computation of the PageRank algorithm
+// Class that take into account all the computation of the PageRank algorithm
 class PageRank {
 	public: 
 		PageRank(std::vector<int> top_k, std::string ds_path, double t_prob) : t_prob(t_prob) {
@@ -17,13 +17,19 @@ class PageRank {
 			this->set_T_matrix();
 		}
 
-		std::vector<int> top_k; // Vector that indicates the top_k value that we have to compute
-		top_k_results<double> PR_topk; // Vector that store the results for each top_k
-		std::unordered_map<int, double> PR_Prestige; // Unordered map that memorize the actual PageRank Prestige for each node
+		// Vector that indicates the top_k value that we have to compute
+		std::vector<int> top_k; 
+
+		// Vector that store the results for each top_k
+		top_k_results<double> PR_topk; 
+
+		// Unordered map that memorize the actual PageRank Prestige for each node
+		std::unordered_map<int, double> PR_Prestige; 
 		int steps = 0;
 		Duration elapsed;
 		
-		// Privare function declaration
+		// Private functions declaration
+
 		void compute();
 		void get_topk_results();
 		void print_topk_results();
@@ -33,19 +39,23 @@ class PageRank {
 		Graph graph;
 		const double t_prob;
 		card_map cardinality_map;
-		std::vector<int> dangling_nodes; // Vector to memorize the ID of dangling nodes
-		std::string algo_str = "PageRank Prestige"; 
-		traspose_pair* pt_traspose; // Pointer for the transpose matrix
 
-		// vector that store the row pointer and to node id of each edge 
+		// Vector to memorize the ID of dangling nodes
+		std::vector<int> dangling_nodes; 
+		std::string algo_str = "PageRank Prestige"; 
+
+		// Pointer for the transpose matrix
+		traspose_pair* pt_traspose; 
+
+		// Vector that stores the row pointer and to node id of each edge 
 		std::vector<std::pair<int, int>> row_pointers; 
 
-		// Public function declaration
+		// Public functions declaration
+
 		void set_card_map_and_dan_node();
 		void add_danglings(int start, int end);
 		void set_T_matrix();
 		bool converge(std::unordered_map<int, double> &temp_Pk);
-
 };
 
 
@@ -56,7 +66,7 @@ void PageRank::add_danglings(int start, int end) {
 }
 
 
-// Fucntion to set the cardinality map and the vector of dangling nodes
+// Function to set the cardinality map and the vector of dangling nodes
 void PageRank::set_card_map_and_dan_node(){
 	int predecessor = -1;
 	int cardinality = 0;
@@ -121,10 +131,9 @@ void PageRank::set_T_matrix() {
 
 
 	for (int j = 0; j < this->graph.edges; j++) {
-
 		if(j == 0 || this->graph.np_pointer[j].second != this->graph.np_pointer[j - 1].second)
 			this->row_pointers.push_back(std::make_pair(j, this->graph.np_pointer[j].second));
-											
+
 														// 1/Oi														 col_index
 		this->pt_traspose[j] = traspose_pair(1. / this->cardinality_map[this->graph.np_pointer[j].first], this->graph.np_pointer[j].first);
 	}
@@ -134,20 +143,21 @@ void PageRank::set_T_matrix() {
 	this->graph.freeMemory(); // Free the Graph structure since now we will use only the transpose matrix
 
 
-	/*for(int i = 0; i < this->graph.edges; i++) {
-		std::cout << this->pt_traspose[i].first << " " << this->pt_traspose[i].second << std::endl;
-	}
-	std::cout << std::endl;
+	// for(int i = 0; i < this->graph.edges; i++) {
+	// 	std::cout << this->pt_traspose[i].first << " " << this->pt_traspose[i].second << std::endl;
+	// }
+	// std::cout << std::endl;
 
-	for(int i = 0; i < this->row_pointers.size(); i++) {
-		std::cout << this->row_pointers[i].first << " " << this->row_pointers[i].second << std::endl;
-	}*/
+	// std::cout << "DEBUG\n row pointers";
+	// for(int i = 0; i < this->row_pointers.size(); i++) {
+	// 	std::cout << this->row_pointers[i].first << " " << this->row_pointers[i].second << std::endl;
+	// }
 
 }
 
 
 
-// Actual function that compute the PageRank Prestige
+// Actual function that computes the PageRank Prestige
 void PageRank::compute() {
 
 	// Initialize a temporary PageRank Prestige that will be empty after each do while iteration 
