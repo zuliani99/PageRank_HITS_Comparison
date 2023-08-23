@@ -47,8 +47,6 @@ class HITS {
 		
 		void compute_L();
 		void compute_L_t();
-		void compute_LLt();
-		void compute_LtL();
 		void create_L_and_L_t();
 		void initialize_ak_hk();
 		void compute();
@@ -81,16 +79,6 @@ class HITS {
 
     	// Stores the empty line in L_t
     	std::vector<unsigned int> row_ptr_not_empty_L_t;
-
-    	unsigned int* LLt_ptr;
-    	std::vector<unsigned int> row_ptr_LLt;
-    	std::vector<unsigned int> row_ptr_not_empty_LLt;
-		unsigned int len_LLt;
-
-		unsigned int* LtL_ptr;
-    	std::vector<unsigned int> row_ptr_LtL;
-    	std::vector<unsigned int> row_ptr_not_empty_LtL;
-		unsigned int len_LtL;
 
 		std::string autority_str = "Authority"; 
 		std::string hub_str = "Hub"; 
@@ -178,111 +166,6 @@ void HITS::compute_L_t(){
 	// }
 }
 
-// Function that computes the matrix multiplication between L and L_t.
-void HITS::compute_LLt() {
-	unsigned int* LLt_ptr_temp = (unsigned int*)mmap(NULL, this->graph.nodes * this->graph.nodes * sizeof(unsigned int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
-	
-	// checking the allocation
-	if (LLt_ptr_temp == MAP_FAILED)
-		throw std::runtime_error("Mapping failed\n");
-	
-	int c = 0;
-
-	this->row_ptr_not_empty_LLt = this->row_ptr_not_empty_L;
-
-	for (unsigned int r = 0; r <= this->row_ptr_L.size() - 2; r++){
-		this->row_ptr_LLt.push_back(c);
-
-		std::vector<unsigned int> temp_col_idx;
-		for(int i = this->row_ptr_L[r]; i < this->row_ptr_L[r + 1]; i ++) 
-			temp_col_idx.push_back(this->L_ptr[i]);
-
-		for(int jump = 0; jump <= this->row_ptr_L.size() - 2; jump ++){
-			unsigned int temp_LLt = 0;
-			for(unsigned int j = this->row_ptr_L[jump]; j < this->row_ptr_L[jump + 1]; j ++) {
-
-				if(std::find(temp_col_idx.begin(), temp_col_idx.end(), this->L_ptr[j]) != temp_col_idx.end())
-					temp_LLt += 1;
-			}
-
-			if(temp_LLt > 0) {
-				LLt_ptr_temp[c] = temp_LLt;
-				c += 1;
-			}
-		}
-	}
-	// std::cout << "DEBUG: compute_LLt()\nc = " << c << "\n";
-	this->len_LLt = c;
-	this->LLt_ptr = (unsigned int*)mmap(NULL, this->len_LLt * sizeof(unsigned int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
-	
-	// checking the allocation
-	if (this->LLt_ptr == MAP_FAILED)
-		throw std::runtime_error("Mapping failed\n");
-
-	std::cout << "LLt_ptr = [";
-	for(int i = 0; i < this->len_LLt; i++){
-		this->LLt_ptr[i] = LLt_ptr_temp[i];
-		std::cout << this->LLt_ptr[i] << ", ";
-	}
-	std::cout << "]\n\n";
-
-	if (munmap(LLt_ptr_temp, this->graph.nodes * this->graph.nodes) != 0)
-    	throw std::runtime_error("Free memory failed\n");
-}
-
-// Function that computes the matrix multiplication between L_t and L.
-void HITS::compute_LtL() {
-	unsigned int* LtL_ptr_temp = (unsigned int*)mmap(NULL, this->graph.nodes * this->graph.nodes * sizeof(unsigned int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
-	
-	// checking the allocation
-	if (LtL_ptr_temp == MAP_FAILED)
-		throw std::runtime_error("Mapping failed\n");
-	
-	int c = 0;
-
-	this->row_ptr_not_empty_LtL = this->row_ptr_not_empty_L_t;
-
-	for (unsigned int r = 0; r <= this->row_ptr_L_t.size() - 2; r++){
-		this->row_ptr_LtL.push_back(c);
-
-		std::vector<unsigned int> temp_col_idx;
-		for(int i = this->row_ptr_L_t[r]; i < this->row_ptr_L_t[r + 1]; i ++) 
-			temp_col_idx.push_back(this->L_t_ptr[i]);
-
-		for(int jump = 0; jump <= this->row_ptr_L_t.size() - 2; jump ++){
-			unsigned int temp_LtL = 0;
-
-			for(unsigned int j = this->row_ptr_L_t[jump]; j < this->row_ptr_L_t[jump + 1]; j ++) {
-				if(std::find(temp_col_idx.begin(), temp_col_idx.end(), this->L_t_ptr[j]) != temp_col_idx.end())
-					temp_LtL += 1;
-			}
-
-			if(temp_LtL > 0) {
-				LtL_ptr_temp[c] = temp_LtL;
-				c += 1;
-			}
-		}
-	}
-
-	// std::cout << "DEBUG: compute_LtL()\nc = " << c << "\n";
-	this->len_LtL = c;
-	this->LtL_ptr = (unsigned int*)mmap(NULL, this->len_LLt * sizeof(unsigned int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
-	
-	// checking the allocation
-	if (this->LtL_ptr == MAP_FAILED)
-		throw std::runtime_error("Mapping failed\n");
-
-	std::cout << "LtL_ptr = [";
-	for(int i = 0; i < this->len_LtL; i++){
-		this->LtL_ptr[i] = LtL_ptr_temp[i];
-		std::cout << this->LtL_ptr[i] << ", ";
-	}
-	std::cout << "]\n\n";
-
-	if (munmap(LtL_ptr_temp, this->graph.nodes * this->graph.nodes) != 0)
-    	throw std::runtime_error("Free memory failed\n");
-}
-
 // Function that creates L and L_t and that performs the two matrix multiplications.
 void HITS::create_L_and_L_t(){
 
@@ -293,9 +176,6 @@ void HITS::create_L_and_L_t(){
 	// sorting again w.r.t. the destination node 
 	std::stable_sort(this->graph.np_pointer, this->graph.np_pointer + this->graph.edges, compareBySecondIncreasing);
 	this->compute_L_t();
-
-	this->compute_LLt();
-	this->compute_LtL();
 
 	// freeing the memory 
 	this->graph.freeMemory();
@@ -313,9 +193,9 @@ void HITS::compute(){
 
 	// auxiliary data structures 
     std::unordered_map<int, double> temp_HITS_authority;
-	for (int i = 0; i < this->graph.nodes; i++) temp_HITS_authority[i] = 0.;
+	for (int i = 0; i < this->graph.nodes; i++) temp_HITS_authority[i] = 1.;
 	std::unordered_map<int, double> temp_HITS_hub;
-	for (int i = 0; i < this->graph.nodes; i++) temp_HITS_hub[i] = 0.;
+	for (int i = 0; i < this->graph.nodes; i++) temp_HITS_hub[i] = 1.;
 
 	auto start = now();
 
@@ -324,49 +204,17 @@ void HITS::compute(){
 		// std::cout << "DEBUG\n step = " << steps << "\n";
         this->steps++;
 
-        // authority score
-		// a_k = L^t * L * a_k-1
-        unsigned int tmp_pos_row_LtL = 0;
-        unsigned int next_starting_row_LtL = this->row_ptr_LtL[1];
-
-		// std::cout << "DEBUG: compute()\n";
-		// std::cout << "row_ptr_not_empty_LtL = [";
-		// for (int i = 0; i<row_ptr_not_empty_LtL.size(); i++){
-		// 	std::cout << row_ptr_not_empty_LtL[i] << ", ";
-		// }
-		// std::cout << "]\n";
-
-        for (unsigned int i = 0; i < this->len_LtL; i++){
-            if (i == next_starting_row_LtL){
-                tmp_pos_row_LtL++;
-                next_starting_row_LtL = this->row_ptr_LtL[tmp_pos_row_LtL + 1];
-            }
-            temp_HITS_authority[this->row_ptr_not_empty_LtL[tmp_pos_row_LtL]] += this->LtL_ptr[i] * this->HITS_authority[this->L_ptr[i]];
-        }
-
-		// std::cout << "STEP = " << steps << "\nauthority = [";
-		// for (int i = 0; i<temp_HITS_authority.size(); i++){
-		// 	std::cout << temp_HITS_authority[i] << ", ";
-		// }
-		// std::cout << "]\n";
-
 		// hub score
-    	// h_k = L * L^t * h_k-1
-        unsigned int tmp_pos_row_LLt = 0;
-        unsigned int next_starting_row_LLt = this->row_ptr_LLt[1];
+    	// h_k = L * a_k-1
 
-		// std::cout << "row_ptr_not_empty_LLt = [";
-		// for (int i = 0; i<row_ptr_not_empty_LLt.size(); i++){
-		// 	std::cout << row_ptr_not_empty_LLt[i] << ", ";
-		// }
-		// std::cout << "]\n";
-
-        for (unsigned int i = 0; i < this->len_LLt; i++){
-            if (i == next_starting_row_LLt){
-                tmp_pos_row_LLt ++;
-                next_starting_row_LLt = this->row_ptr_LLt[tmp_pos_row_LLt + 1];
+        unsigned int tmp_pos_row = 0;
+        unsigned int next_starting_row = this->row_ptr_L[1];
+        for (unsigned int i = 0; i < this->graph.edges; i++){
+            if (i == next_starting_row){
+                tmp_pos_row++;
+                next_starting_row = this->row_ptr_L[tmp_pos_row + 1];
             }
-            temp_HITS_hub[this->row_ptr_not_empty_LLt[tmp_pos_row_LLt]] += this->LLt_ptr[i] * this->HITS_hub[this->L_t_ptr[i]];
+			temp_HITS_hub[this->row_ptr_not_empty_L[tmp_pos_row]] += 1 * this->HITS_hub[this->L_ptr[i]];
         }
 
 		// std::cout << "hub = [";
@@ -375,18 +223,37 @@ void HITS::compute(){
 		// }
 		// std::cout << "]\n";
 
-        this->normalize(temp_HITS_authority, temp_HITS_hub);
-		// std::cout << "After normalization\n";
+        // authority score
+		// a_k = L^t * h_k-1
+
+        tmp_pos_row = 0;
+        next_starting_row = this->row_ptr_L_t[1];
+        for (unsigned int i = 0; i < this->graph.edges; i++){
+            if (i == next_starting_row){
+                tmp_pos_row++;
+                next_starting_row = this->row_ptr_L_t[tmp_pos_row + 1];
+            }
+			temp_HITS_authority[this->row_ptr_not_empty_L_t[tmp_pos_row]] += 1 * this->HITS_authority[this->L_t_ptr[i]];
+		}
+
 		// std::cout << "authority = [";
 		// for (int i = 0; i<temp_HITS_authority.size(); i++){
 		// 	std::cout << temp_HITS_authority[i] << ", ";
 		// }
 		// std::cout << "]\n";
-		// std::cout << "hub = [";
-		// for (int i = 0; i<temp_HITS_hub.size(); i++){
-		// 	std::cout << temp_HITS_hub[i] << ", ";
-		// }
-		// std::cout << "]\n\n";
+
+        this->normalize(temp_HITS_authority, temp_HITS_hub);
+		std::cout << "After normalization\n";
+		std::cout << "authority = [";
+		for (int i = 0; i<temp_HITS_authority.size(); i++){
+			std::cout << temp_HITS_authority[i] << ", ";
+		}
+		std::cout << "]\n";
+		std::cout << "hub = [";
+		for (int i = 0; i<temp_HITS_hub.size(); i++){
+			std::cout << temp_HITS_hub[i] << ", ";
+		}
+		std::cout << "]\n\n";
     } while (this->converge(temp_HITS_authority, temp_HITS_hub));
 	
 	this->elapsed = now() - start;
@@ -398,10 +265,10 @@ bool HITS::converge(std::unordered_map<int, double> &temp_a, std::unordered_map<
 	double distance_h = 0.;
 
 	for (int i = 0; i < temp_a.size(); i++) 
-		distance_a += std::abs(this->HITS_authority[i] - temp_a[i]);
+		distance_a += std::pow(std::abs(this->HITS_authority[i] - temp_a[i]),2.);
 
 	for (int i = 0; i < temp_h.size(); i++) 
-		distance_h += std::abs(this->HITS_hub[i] - temp_h[i]);
+		distance_h += std::pow(std::abs(this->HITS_hub[i] - temp_h[i]),2.);
 
 	this->HITS_authority = temp_a;
 	this->HITS_hub = temp_h;
@@ -412,7 +279,7 @@ bool HITS::converge(std::unordered_map<int, double> &temp_a, std::unordered_map<
 	for (int i = 0; i < this->graph.nodes; i++) temp_a[i] = 1.;
 	for (int i = 0; i < this->graph.nodes; i++) temp_h[i] = 1.;
 
-	return distance_a > std::pow(10, -6) and distance_h > std::pow(10,-6);
+	return std::sqrt(distance_a) > std::pow(10, -6) and std::sqrt(distance_h) > std::pow(10,-6);
 }
 
 // Function that normalizes the vectors in order to obtain a probability distribution.
