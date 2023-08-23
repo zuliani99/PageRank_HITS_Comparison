@@ -36,7 +36,7 @@ class JaccardCoefficient {
 		std::map<int, std::vector<int>> get_first_element_vector(top_k_results<T> &topk_vector);
 
 		std::vector<int> intersection(std::vector<int> &v1, std::vector<int> &v2);
-		double jaccard_distance(std::vector<int> &v1, std::vector<int> &v2);
+		double jaccard_coefficient(std::vector<int> &v1, std::vector<int> &v2);
 };
 
 
@@ -78,12 +78,12 @@ std::vector<int> JaccardCoefficient::intersection(std::vector<int> &v1, std::vec
 
 
 // Function that returns the Jaccard index of two sets
-double JaccardCoefficient::jaccard_distance(std::vector<int> &v1, std::vector<int> &v2) {
+double JaccardCoefficient::jaccard_coefficient(std::vector<int> &v1, std::vector<int> &v2) {
     // Get the intersection Size set
     double size_in = this->intersection(v1, v2).size();
  
     // Return the Jaccard Distance using the formula and the Jaccard Index
-    return 1 - (size_in / (v1.size() + v2.size() - size_in));
+    return size_in / (v1.size() + v2.size() - size_in);
 }
 
 
@@ -93,15 +93,15 @@ void JaccardCoefficient::obtain_results() {
 		std::vector<std::pair<std::string, double>> temp_res;
 
 		// ID_HITS
-		temp_res.push_back(std::make_pair<std::string, double>("InDegree vs HITS (authority)", this->jaccard_distance(this->nodes_ID_topk[k], this->nodes_HITS_authority_topk[k])));
-		temp_res.push_back(std::make_pair<std::string, double>("InDegree vs HITS (hub)", this->jaccard_distance(this->nodes_ID_topk[k], this->nodes_HITS_hub_topk[k])));
+		temp_res.push_back(std::make_pair<std::string, double>("InDegree vs HITS (authority)", this->jaccard_coefficient(this->nodes_ID_topk[k], this->nodes_HITS_authority_topk[k])));
+		temp_res.push_back(std::make_pair<std::string, double>("InDegree vs HITS (hub)", this->jaccard_coefficient(this->nodes_ID_topk[k], this->nodes_HITS_hub_topk[k])));
 	
 		// ID_PR
-		temp_res.push_back(std::make_pair<std::string, double>("InDegree vs PageRank", this->jaccard_distance(this->nodes_ID_topk[k], this->nodes_PR_topk[k])));
+		temp_res.push_back(std::make_pair<std::string, double>("InDegree vs PageRank", this->jaccard_coefficient(this->nodes_ID_topk[k], this->nodes_PR_topk[k])));
 
 		// PR_HITS
-		temp_res.push_back(std::make_pair<std::string, double>("PageRank vs HITS (authority)", this->jaccard_distance(this->nodes_PR_topk[k], this->nodes_HITS_authority_topk[k])));
-		temp_res.push_back(std::make_pair<std::string, double>("PageRank vs HITS (hub)", this->jaccard_distance(this->nodes_PR_topk[k], this->nodes_HITS_hub_topk[k])));
+		temp_res.push_back(std::make_pair<std::string, double>("PageRank vs HITS (authority)", this->jaccard_coefficient(this->nodes_PR_topk[k], this->nodes_HITS_authority_topk[k])));
+		temp_res.push_back(std::make_pair<std::string, double>("PageRank vs HITS (hub)", this->jaccard_coefficient(this->nodes_PR_topk[k], this->nodes_HITS_hub_topk[k])));
 
 		this->jaccard_results[k] = temp_res;
 	}

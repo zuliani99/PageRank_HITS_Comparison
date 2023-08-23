@@ -27,10 +27,10 @@ class HITS {
     	// Vector of hub scores at time k.
     	// std::vector<double> h_k;
 
-		// Map: NodeID <-> authority score.
+		// Map: NodeID <-> authority score at time k.
 		std::unordered_map<int, double> HITS_authority;
 
-		// Map: NodeID <-> hub score.
+		// Map: NodeID <-> hub score at time k.
 		std::unordered_map<int, double> HITS_hub;
 
 		// Vector containing the final top-k authority scores.
@@ -191,9 +191,11 @@ void HITS::initialize_ak_hk(){
 void HITS::compute(){
     this->steps = 0;
 
-	// auxiliary data structures 
+	// authority scores at time k+1
     std::unordered_map<int, double> temp_HITS_authority;
 	for (int i = 0; i < this->graph.nodes; i++) temp_HITS_authority[i] = 1.;
+
+	// hub scores at time k+1
 	std::unordered_map<int, double> temp_HITS_hub;
 	for (int i = 0; i < this->graph.nodes; i++) temp_HITS_hub[i] = 1.;
 
@@ -214,7 +216,7 @@ void HITS::compute(){
                 tmp_pos_row++;
                 next_starting_row = this->row_ptr_L[tmp_pos_row + 1];
             }
-			temp_HITS_hub[this->row_ptr_not_empty_L[tmp_pos_row]] += 1 * this->HITS_hub[this->L_ptr[i]];
+			temp_HITS_hub[this->row_ptr_not_empty_L[tmp_pos_row]] += 1 * this->HITS_authority[this->L_ptr[i]];
         }
 
 		// std::cout << "hub = [";
@@ -233,7 +235,7 @@ void HITS::compute(){
                 tmp_pos_row++;
                 next_starting_row = this->row_ptr_L_t[tmp_pos_row + 1];
             }
-			temp_HITS_authority[this->row_ptr_not_empty_L_t[tmp_pos_row]] += 1 * this->HITS_authority[this->L_t_ptr[i]];
+			temp_HITS_authority[this->row_ptr_not_empty_L_t[tmp_pos_row]] += 1 * this->HITS_hub[this->L_t_ptr[i]];
 		}
 
 		// std::cout << "authority = [";
@@ -243,17 +245,19 @@ void HITS::compute(){
 		// std::cout << "]\n";
 
         this->normalize(temp_HITS_authority, temp_HITS_hub);
-		std::cout << "After normalization\n";
-		std::cout << "authority = [";
-		for (int i = 0; i<temp_HITS_authority.size(); i++){
-			std::cout << temp_HITS_authority[i] << ", ";
-		}
-		std::cout << "]\n";
-		std::cout << "hub = [";
-		for (int i = 0; i<temp_HITS_hub.size(); i++){
-			std::cout << temp_HITS_hub[i] << ", ";
-		}
-		std::cout << "]\n\n";
+		
+		// std::cout << "After normalization\n";
+		// std::cout << "hub = [";
+		// for (int i = 0; i<temp_HITS_hub.size(); i++){
+		// 	std::cout << temp_HITS_hub[i] << ", ";
+		// }
+		// std::cout << "]\n";
+		// std::cout << "authority = [";
+		// for (int i = 0; i<temp_HITS_authority.size(); i++){
+		// 	std::cout << temp_HITS_authority[i] << ", ";
+		// }
+		// std::cout << "]\n\n";
+		
     } while (this->converge(temp_HITS_authority, temp_HITS_hub));
 	
 	this->elapsed = now() - start;
@@ -272,12 +276,6 @@ bool HITS::converge(std::unordered_map<int, double> &temp_a, std::unordered_map<
 
 	this->HITS_authority = temp_a;
 	this->HITS_hub = temp_h;
-
-	temp_a.clear();
-	temp_h.clear();
-
-	for (int i = 0; i < this->graph.nodes; i++) temp_a[i] = 1.;
-	for (int i = 0; i < this->graph.nodes; i++) temp_h[i] = 1.;
 
 	return std::sqrt(distance_a) > std::pow(10, -6) and std::sqrt(distance_h) > std::pow(10,-6);
 }
