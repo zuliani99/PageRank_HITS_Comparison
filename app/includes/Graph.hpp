@@ -5,6 +5,8 @@
 #include <limits.h>
 #include "./Utils.hpp"
 #include <sstream>
+#include <cmath>
+
 
 // Class that describes the general behaviour that a graph has, with relative generic functions
 class Graph {

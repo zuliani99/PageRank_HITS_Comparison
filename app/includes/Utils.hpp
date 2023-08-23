@@ -15,14 +15,14 @@
 using nodes_pair = std::pair<int, int>;
 
 // Typedef for the cardinality map: (node_id, cardinality)
-using card_map = std::map<int, int>;
+using card_map = std::unordered_map<int, int>;
 
 // Typedef for the transpose matrix: (value, from_node_id) -> used for the sparse matrix representation
 using traspose_pair = std::pair<double, int>;
 
 // Typedef for the result of each algorithm for all top_k
 template<typename T>
-using top_k_results = std::map<int, std::vector<std::pair<int, T>>>;
+using top_k_results = std::unordered_map<int, std::vector<std::pair<int, T>>>;
 
 // Time execution statements
 static auto now = std::chrono::high_resolution_clock::now;

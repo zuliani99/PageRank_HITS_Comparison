@@ -68,24 +68,26 @@ void PageRank::add_danglings(int start, int end) {
 
 // Function to set the cardinality map and the vector of dangling nodes
 void PageRank::set_card_map_and_dan_node(){
-	int predecessor = -1;
 	int cardinality = 0;
 
 	// Sort the sequence of pair of points by the fist element by increasingly oder
 	std::stable_sort(this->graph.np_pointer, this->graph.np_pointer + this->graph.edges, compareByFirstIncreasing);
 
+	int predecessor = this->graph.np_pointer[0].first;//-1;
+
 	for (int i = 0; i < this->graph.edges; i++) {
+		//std::cout << predecessor << " " << this->graph.np_pointer[i].first << std::endl;
 		if (predecessor == this->graph.np_pointer[i].first) {
 			cardinality++;
 		} else {
-			if (predecessor == -1) {
-				this->add_danglings(predecessor, this->graph.np_pointer[i].first);
-			} else {
-				this->cardinality_map[predecessor] = cardinality;
+			//if (predecessor == -1 && this->graph.edges != this->graph.max_node) {
+			//	this->add_danglings(predecessor, this->graph.np_pointer[i].first);
+			//} else {
+			this->cardinality_map[predecessor] = cardinality;
 				
-				if (this->graph.np_pointer[i].first - predecessor > 1)
-					this->add_danglings(predecessor, this->graph.np_pointer[i].first);
-			}
+			if (this->graph.np_pointer[i].first - predecessor > 1)
+				this->add_danglings(predecessor, this->graph.np_pointer[i].first);
+			//}
 			predecessor = this->graph.np_pointer[i].first;
 			cardinality = 1;
 		}
@@ -132,14 +134,14 @@ void PageRank::set_T_matrix() {
 
 	for (int j = 0; j < this->graph.edges; j++) {
 		if(j == 0 || this->graph.np_pointer[j].second != this->graph.np_pointer[j - 1].second)
-			this->row_pointers.push_back(std::make_pair(j, this->graph.np_pointer[j].second));
+			this->row_pointers.push_back(std::make_pair(j, this->graph.np_pointer[j].second - this->graph.min_node));
 
 														// 1/Oi														 col_index
 		this->pt_traspose[j] = traspose_pair(1. / this->cardinality_map[this->graph.np_pointer[j].first], this->graph.np_pointer[j].first);
 	}
 
 
-	this->row_pointers.push_back(std::make_pair(-1, -1)); // Notify the conclusion of out transpose matrix
+	this->row_pointers.push_back(std::make_pair(this->graph.edges, this->graph.edges)); // Notify the conclusion of out transpose matrix
 	this->graph.freeMemory(); // Free the Graph structure since now we will use only the transpose matrix
 
 
@@ -162,7 +164,7 @@ void PageRank::compute() {
 
 	// Initialize a temporary PageRank Prestige that will be empty after each do while iteration 
 	std::unordered_map<int, double> current_PR_Prestige;
-	for (int i = 0; i < this->graph.nodes; i++) current_PR_Prestige[i] = 1. / this->graph.nodes;
+	for (int i = 0; i < this->graph.nodes; i++) current_PR_Prestige[i] = 0.;// 1. / this->graph.nodes;
 
 	auto start = now();
 
@@ -171,8 +173,7 @@ void PageRank::compute() {
 
 		// Computing the PageRank of dangling nodes
 		for(int dan : this->dangling_nodes)
-			dangling_Pk += this->PR_Prestige[dan] / this->graph.edges; // - this->graph.min_node
-
+			dangling_Pk += this->PR_Prestige[dan - this->graph.min_node] * (1. / this->graph.nodes);
 
 		int row_ptr = 0;
 		int next_row_ptr = this->row_pointers[row_ptr + 1].first;  
@@ -189,14 +190,22 @@ void PageRank::compute() {
 			// Here is done the actual matrix moltiplication between the transpose matrix #edges x #edges times the PR column vector #edges x 1
 			// So the summation between all the moltiplication of the elements of a given row and the element of the column vector
 
-			current_PR_Prestige[this->row_pointers[row_ptr].second] += this->pt_traspose[i].first * this->PR_Prestige[this->pt_traspose[i].second];
+			current_PR_Prestige[this->row_pointers[row_ptr].second] += this->pt_traspose[i].first * this->PR_Prestige[this->pt_traspose[i].second - this->graph.min_node];
 		}
 
 		// Computing -------------------------> (d_Pk + A^t * P_k) * d 						 +				 (1 - d) / n
-		for (int i = 0; i < this->graph.edges; i++)	
+		for (int i = 0; i < current_PR_Prestige.size(); i++)	
 			current_PR_Prestige[i] = ((dangling_Pk + current_PR_Prestige[i]) * this->t_prob) + (1 - this->t_prob) / this->graph.nodes;
 
 		this->steps++;
+
+		/*std::cout << "]\n";
+		std::cout << "current_PR_Prestige = [";
+		for (int i = 0; i<current_PR_Prestige.size(); i++){
+			std::cout << current_PR_Prestige[i] << ", ";
+		}
+		std::cout << "]\n\n";*/
+
 
 	} while(this->converge(current_PR_Prestige)); // Check convergence
 
@@ -211,15 +220,15 @@ bool PageRank::converge(std::unordered_map<int, double> &temp_Pk) {
 
 	// Get the total distance of absolute difference between the actual PR Prestige vector and the early computed one
 	for (int i = 0; i < temp_Pk.size(); i++) 
-		distance += std::abs(this->PR_Prestige[i] - temp_Pk[i]);
+		distance += std::pow(std::abs(this->PR_Prestige[i] - temp_Pk[i]), 2.);
 
 	this->PR_Prestige = temp_Pk; // Update
 
 	// Empty the temporary vector
 	temp_Pk.clear();
-	for (int i = 0; i < this->graph.nodes; i++) temp_Pk[i] = 1. / this->graph.nodes;
+	for (int i = 0; i < this->graph.nodes; i++) temp_Pk[i] = 0.;//1. / this->graph.nodes;
 
-	return distance > std::pow(10, -6); // Verify the convergence
+	return std::sqrt(distance) > std::pow(10, -10); // Verify the convergence
 }
 
 

@@ -246,17 +246,17 @@ void HITS::compute(){
 
         this->normalize(temp_HITS_authority, temp_HITS_hub);
 		
-		// std::cout << "After normalization\n";
-		// std::cout << "hub = [";
-		// for (int i = 0; i<temp_HITS_hub.size(); i++){
-		// 	std::cout << temp_HITS_hub[i] << ", ";
-		// }
-		// std::cout << "]\n";
-		// std::cout << "authority = [";
-		// for (int i = 0; i<temp_HITS_authority.size(); i++){
-		// 	std::cout << temp_HITS_authority[i] << ", ";
-		// }
-		// std::cout << "]\n\n";
+		/*std::cout << "After normalization\n";
+		std::cout << "hub = [";
+		for (int i = 0; i<temp_HITS_hub.size(); i++){
+		 	std::cout << temp_HITS_hub[i] << ", ";
+		}
+		std::cout << "]\n";
+		std::cout << "authority = [";
+		for (int i = 0; i<temp_HITS_authority.size(); i++){
+		 	std::cout << temp_HITS_authority[i] << ", ";
+		}
+		std::cout << "]\n\n";*/
 		
     } while (this->converge(temp_HITS_authority, temp_HITS_hub));
 	
@@ -269,15 +269,15 @@ bool HITS::converge(std::unordered_map<int, double> &temp_a, std::unordered_map<
 	double distance_h = 0.;
 
 	for (int i = 0; i < temp_a.size(); i++) 
-		distance_a += std::pow(std::abs(this->HITS_authority[i] - temp_a[i]),2.);
+		distance_a += std::pow(std::abs(this->HITS_authority[i] - temp_a[i]), 2.);
 
 	for (int i = 0; i < temp_h.size(); i++) 
-		distance_h += std::pow(std::abs(this->HITS_hub[i] - temp_h[i]),2.);
+		distance_h += std::pow(std::abs(this->HITS_hub[i] - temp_h[i]), 2.);
 
 	this->HITS_authority = temp_a;
 	this->HITS_hub = temp_h;
 
-	return std::sqrt(distance_a) > std::pow(10, -6) and std::sqrt(distance_h) > std::pow(10,-6);
+	return std::sqrt(distance_a) > std::pow(10, -10) && std::sqrt(distance_h) > std::pow(10, -10);
 }
 
 // Function that normalizes the vectors in order to obtain a probability distribution.
