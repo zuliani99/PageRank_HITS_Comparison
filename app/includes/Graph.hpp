@@ -126,7 +126,7 @@ void Graph::allocate_memory() {
 }
 
 
-// Function that frees the permanent memory
+// Function that frees the permanent memory regarding the graph
 void Graph::freeMemory() {
 	if (munmap(this->np_pointer, this->edges) != 0)
     	throw std::runtime_error("Free memory failed\n");

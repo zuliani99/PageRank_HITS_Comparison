@@ -34,6 +34,7 @@ class PageRank {
 		void get_topk_results();
 		void print_topk_results();
 		void print_stats();
+		void free_T_matrix_memory();
 
 	private:
 		Graph graph;
@@ -229,6 +230,14 @@ bool PageRank::converge(std::unordered_map<int, double> &temp_Pk) {
 	for (int i = 0; i < this->graph.nodes; i++) temp_Pk[i] = 0.;//1. / this->graph.nodes;
 
 	return std::sqrt(distance) > std::pow(10, -10); // Verify the convergence
+}
+
+
+
+// Function that frees the permanent memory regarding the transpose matrix
+void PageRank::free_T_matrix_memory(){
+	if (munmap(this->pt_traspose, this->graph.edges) != 0)
+    	throw std::runtime_error("Free memory failed\n");
 }
 
 

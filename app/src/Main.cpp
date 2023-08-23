@@ -4,8 +4,8 @@
 #include "../includes/Jaccard.hpp"
 
 int main(){
-	//std::vector<std::string> datasets = {"../dataset/web-NotreDame.txt", "../dataset/web-BerkStan.txt"};
-	std::vector<std::string> datasets = {"../dataset/test-dataset.txt"};
+	std::vector<std::string> datasets = {"../dataset/web-BerkStan.txt", "../dataset/web-Google.txt", "../dataset/web-NotreDame.txt", "../dataset/web-BerkStan.txt"};
+	//std::vector<std::string> datasets = {"../dataset/test-dataset.txt"};
 	// std::vector<std::string> datasets = {"../dataset/web-BerkStan.txt"};
 	//std::vector<std::string> datasets = {"../dataset/test-dataset_copy.txt"};
 	std::vector<int> top_k = {5};//,10, 20, 30, 40};
@@ -29,6 +29,7 @@ int main(){
 		page_rank.print_stats();
 		page_rank.get_topk_results();
 		page_rank.print_topk_results();
+		page_rank.free_T_matrix_memory();
 		std::cout << std::endl;
 
 		// HITS
@@ -42,6 +43,7 @@ int main(){
 		hits.print_topk_hub();
 		std::cout << std::endl;
 		hits.print_topk_authority();
+		hits.free_matrices_memory();
 		std::cout << std::endl;
 
 		// JaccardCoefficient jaccard = JaccardCoefficient(top_k, in_degree.IN_topk, page_rank.PR_topk, hits.authority_topk, hits.hub_topk);
