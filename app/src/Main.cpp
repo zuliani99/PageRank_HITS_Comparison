@@ -17,12 +17,10 @@ int main(){
 
 	if (verbose != 0 && verbose != 1) throw std::invalid_argument("Please insert correct input");
 
-
 	std::vector<std::string> datasets = {"web-BerkStan.txt", "web-Google.txt", "web-NotreDame.txt", "web-BerkStan.txt"};
-	//std::vector<std::string> datasets = {"../dataset/web-BerkStan.txt"};
-	//std::vector<std::string> datasets = {"../dataset/test-dataset_copy.txt"};
 
-	std::vector<int> top_k = {10, 20, 30, 40};
+	std::vector<int> top_k; //= {10, 50, 100, 1000, 10000, 100000, 200000};
+	for(int i = 0; i < 18; i++) top_k.push_back(std::pow(2, i));
 
 	const auto p1 = std::chrono::system_clock::now();
 	std::time_t today_time = std::chrono::system_clock::to_time_t(p1);
@@ -44,7 +42,7 @@ int main(){
     stream_elapsed << "dataset,PR,HITS,ID\n";
 
     stream_steps.open("../results/" + result_path + "/" + csv_steps, std::ios::out | std::ios::app);
-    stream_steps << "dataset,PR,HITS,ID\n";
+    stream_steps << "dataset,PR,HITS\n";
 
 	std::cout << std::endl;
 
@@ -92,7 +90,7 @@ int main(){
 		if(verbose) jaccard.print_results();
 
 		jaccard.save_results(stream_jaccard, ds);
-    	stream_steps << ds << "," << page_rank.steps << "," << hits.steps << "," << in_degree.steps <<"\n";
+    	stream_steps << ds << "," << page_rank.steps << "," << hits.steps <<"\n";
     	stream_elapsed << ds << "," << page_rank.elapsed.count() << "," << hits.elapsed.count() << "," << in_degree.elapsed.count() <<"\n";
 
 		std::cout << "-------------------" << ds << "---------------------" << std::endl << std::endl;
