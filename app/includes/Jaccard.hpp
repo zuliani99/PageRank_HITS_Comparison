@@ -19,6 +19,7 @@ class JaccardCoefficient {
 		// Public function declaration
 		void obtain_results();
 		void print_results();
+		void save_results(std::fstream &stream_jaccard, std::string &ds);
 
 	private:
 		std::map<int, std::vector<int>> nodes_ID_topk;
@@ -93,15 +94,18 @@ void JaccardCoefficient::obtain_results() {
 		std::vector<std::pair<std::string, double>> temp_res;
 
 		// ID_HITS
-		temp_res.push_back(std::make_pair<std::string, double>("InDegree vs HITS (authority)", this->jaccard_coefficient(this->nodes_ID_topk[k], this->nodes_HITS_authority_topk[k])));
-		temp_res.push_back(std::make_pair<std::string, double>("InDegree vs HITS (hub)", this->jaccard_coefficient(this->nodes_ID_topk[k], this->nodes_HITS_hub_topk[k])));
+		temp_res.push_back(std::make_pair<std::string, double>("InDegree VS HITS (authority)", this->jaccard_coefficient(this->nodes_ID_topk[k], this->nodes_HITS_authority_topk[k])));
+		temp_res.push_back(std::make_pair<std::string, double>("InDegree VS HITS (hub)", this->jaccard_coefficient(this->nodes_ID_topk[k], this->nodes_HITS_hub_topk[k])));
 	
 		// ID_PR
-		temp_res.push_back(std::make_pair<std::string, double>("InDegree vs PageRank", this->jaccard_coefficient(this->nodes_ID_topk[k], this->nodes_PR_topk[k])));
+		temp_res.push_back(std::make_pair<std::string, double>("InDegree VS PageRank", this->jaccard_coefficient(this->nodes_ID_topk[k], this->nodes_PR_topk[k])));
 
 		// PR_HITS
-		temp_res.push_back(std::make_pair<std::string, double>("PageRank vs HITS (authority)", this->jaccard_coefficient(this->nodes_PR_topk[k], this->nodes_HITS_authority_topk[k])));
-		temp_res.push_back(std::make_pair<std::string, double>("PageRank vs HITS (hub)", this->jaccard_coefficient(this->nodes_PR_topk[k], this->nodes_HITS_hub_topk[k])));
+		temp_res.push_back(std::make_pair<std::string, double>("PageRank VS HITS (authority)", this->jaccard_coefficient(this->nodes_PR_topk[k], this->nodes_HITS_authority_topk[k])));
+		temp_res.push_back(std::make_pair<std::string, double>("PageRank VS HITS (hub)", this->jaccard_coefficient(this->nodes_PR_topk[k], this->nodes_HITS_hub_topk[k])));
+
+		// AUT_HUB
+		temp_res.push_back(std::make_pair<std::string, double>("HITS (authority) VS HITS (hub)", this->jaccard_coefficient(this->nodes_HITS_authority_topk[k], this->nodes_HITS_hub_topk[k])));
 
 		this->jaccard_results[k] = temp_res;
 	}
@@ -115,6 +119,16 @@ void JaccardCoefficient::print_results() {
 		for(auto result : pair1.second)
 			std::cout << "\t" << result.first << ": " << result.second << std::endl; 
 		std::cout << std::endl;
+	}
+}
+
+
+// Function to save the jaccard coefficients in a .csv file
+void JaccardCoefficient::save_results(std::fstream &stream_jaccard, std::string &ds) {
+	for(auto pair1 : this->jaccard_results) {
+		stream_jaccard << ds << "," << pair1.first;
+		for(auto result : pair1.second) stream_jaccard << "," << result.second; 
+		stream_jaccard << '\n';
 	}
 }
 

@@ -18,6 +18,7 @@ class InDegree {
 		std::string algo_str = "In Degree"; 
 		std::unordered_map<int, int> In_Deg_Prestige; // Unordered map that memorize the actual InDegree Prestige for each node
 		Duration elapsed;
+		int steps = 0;
 
 		// Private function declaration
 		void compute();
@@ -32,6 +33,7 @@ class InDegree {
 
 // Function to compute the InDegree value of each node analysing the edges
 void InDegree::compute() {
+	this->steps = this->graph.edges;
 	auto start = now(); // Timer start
 	for(int i = 0; i < this->graph.edges; i++)
 		this->In_Deg_Prestige[this->graph.np_pointer[i].second] += 1;
