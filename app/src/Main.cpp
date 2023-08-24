@@ -8,11 +8,21 @@
 
 
 int main(){
-	//std::vector<std::string> datasets = {"web-BerkStan.txt", "web-Google.txt"};//, "../dataset/web-NotreDame.txt", "../dataset/web-BerkStan.txt"};
-	std::vector<std::string> datasets = {"test-dataset.txt", "test-dataset_copy.txt"};
+
+	bool verbose;
+
+	std::cout << "--------------------------- PageRank - HITS - InDegree Comparison ---------------------------\n\n";
+	std::cout << "Do you want to activate VERBOSE mode? (0/1) ";
+	std::cin >> verbose;
+
+	if (verbose != 0 && verbose != 1) throw std::invalid_argument("Please insert correct input");
+
+
+	std::vector<std::string> datasets = {"web-BerkStan.txt", "web-Google.txt", "web-NotreDame.txt", "web-BerkStan.txt"};
 	//std::vector<std::string> datasets = {"../dataset/web-BerkStan.txt"};
 	//std::vector<std::string> datasets = {"../dataset/test-dataset_copy.txt"};
-	std::vector<int> top_k = {5,10};//,10, 20, 30, 40};
+
+	std::vector<int> top_k = {10, 20, 30, 40};
 
 	const auto p1 = std::chrono::system_clock::now();
 	std::time_t today_time = std::chrono::system_clock::to_time_t(p1);
@@ -36,6 +46,7 @@ int main(){
     stream_steps.open("../results/" + result_path + "/" + csv_steps, std::ios::out | std::ios::app);
     stream_steps << "dataset,PR,HITS,ID\n";
 
+	std::cout << std::endl;
 
 	for (auto ds : datasets) {
 
@@ -47,7 +58,7 @@ int main(){
 		in_degree.compute();
 		in_degree.print_stats();
 		in_degree.get_topk_results();
-		in_degree.print_topk_results();
+		if(verbose) in_degree.print_topk_results();
 		std::cout << std::endl;
 
 		// PageRank
@@ -56,7 +67,7 @@ int main(){
 		page_rank.compute();
 		page_rank.print_stats();
 		page_rank.get_topk_results();
-		page_rank.print_topk_results();
+		if(verbose) page_rank.print_topk_results();
 		page_rank.free_T_matrix_memory();
 		std::cout << std::endl;
 
@@ -67,16 +78,18 @@ int main(){
 		hits.print_stats();
 		hits.get_topk_hub();
 		hits.get_topk_authority();
-		std::cout << std::endl;
-		hits.print_topk_hub();
-		std::cout << std::endl;
-		hits.print_topk_authority();
+		if(verbose) {
+			std::cout << std::endl;
+			hits.print_topk_hub();
+			std::cout << std::endl;
+			hits.print_topk_authority();
+		}
 		hits.free_matrices_memory();
 		std::cout << std::endl;
 
 		JaccardCoefficient jaccard = JaccardCoefficient(top_k, in_degree.IN_topk, page_rank.PR_topk, hits.authority_topk, hits.hub_topk);
 		jaccard.obtain_results();
-		jaccard.print_results();
+		if(verbose) jaccard.print_results();
 
 		jaccard.save_results(stream_jaccard, ds);
     	stream_steps << ds << "," << page_rank.steps << "," << hits.steps << "," << in_degree.steps <<"\n";

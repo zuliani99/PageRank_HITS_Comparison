@@ -58,5 +58,5 @@ void InDegree::print_topk_results() {
 
 // Function to print the elapsed time
 void InDegree::print_stats() {
-	std::cout << "Elapsed: " << this->elapsed.count() << " ms" << std::endl;
+	std::cout << "Elapsed: " << this->elapsed.count() << " ms \t Steps: "<< this->steps << std::endl;
 }
