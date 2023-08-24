@@ -264,7 +264,6 @@ void HITS::compute(){
 	this->elapsed = now() - start;
 }
 
-
 // Function that establishes whether the execution of the HITS algorithm should continue or not.
 bool HITS::converge(std::unordered_map<int, double> &temp_a, std::unordered_map<int,double> &temp_h){
 	double distance_a = 0.;
@@ -282,7 +281,6 @@ bool HITS::converge(std::unordered_map<int, double> &temp_a, std::unordered_map<
 	return std::sqrt(distance_a) > std::pow(10, -10) && std::sqrt(distance_h) > std::pow(10, -10);
 }
 
-
 // Function that normalizes the vectors in order to obtain a probability distribution.
 void HITS::normalize(std::unordered_map<int, double> &ak, std::unordered_map<int, double> &hk){
 	double sum_a_k = 0.0;
@@ -299,7 +297,7 @@ void HITS::normalize(std::unordered_map<int, double> &ak, std::unordered_map<int
 	}
 }
 
-
+// Function that frees the memory from the matrices created during the computing phase.
 void HITS::free_matrices_memory(){
 	if (munmap(this->L_ptr, this->graph.edges) != 0)
     	throw std::runtime_error("Free memory failed\n");
@@ -308,19 +306,15 @@ void HITS::free_matrices_memory(){
     	throw std::runtime_error("Free memory failed\n");
 }
 
-
-
 // Function that gets the top-k nodes w.r.t. the authority score.
 void HITS::get_topk_authority() {
 	this->graph.get_algo_topk_results<int, double>(this->HITS_authority, this->top_k, this->authority_topk); 
 }
 
-
 // Function that gets the top-k nodes w.r.t. the hub score.
 void HITS::get_topk_hub() {
 	this->graph.get_algo_topk_results<int, double>(this->HITS_hub, this->top_k, this->hub_topk); 
 }
-
 
 // Function that prints the content of the authority vector.
 void HITS::print_authority(){
@@ -330,7 +324,6 @@ void HITS::print_authority(){
 	}
 	std::cout << "]\n";
 }
-
 
 // Function that prints the content of the hub vector.
 void HITS::print_hub(){
@@ -348,7 +341,6 @@ void HITS::print_topk_authority() {
 	this->graph.print_algo_topk_results<double>(this->authority_topk, this->autority_str); 
 }
 
-
 // Function that prints the hub scores for the top-k nodes.
 void HITS::print_topk_hub() {
 	std::cout << "Hub scores" << std::endl;
@@ -356,7 +348,6 @@ void HITS::print_topk_hub() {
 	this->graph.print_algo_topk_results<double>(this->hub_topk, this->hub_str); 
 
 }
-
 
 // Function that prints the execution time and the number of steps taken by the HITS algorithm to converge.
 void HITS::print_stats() {

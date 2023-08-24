@@ -17,10 +17,10 @@ int main(){
 
 	if (verbose != 0 && verbose != 1) throw std::invalid_argument("Please insert correct input");
 
-	std::vector<std::string> datasets = {"web-BerkStan.txt", "web-Google.txt", "web-NotreDame.txt", "web-BerkStan.txt"};
-
-	std::vector<int> top_k; //= {10, 50, 100, 1000, 10000, 100000, 200000};
-	for(int i = 0; i < 18; i++) top_k.push_back(std::pow(2, i));
+	std::vector<std::string> datasets = {"web-NotreDame.txt", "web-Stanford.txt", "web-BerkStan.txt", "web-Google.txt"};
+	
+	std::vector<int> top_k; 
+	for (int i = 0; i<19; i++) top_k.push_back(std::pow(2,i));
 
 	const auto p1 = std::chrono::system_clock::now();
 	std::time_t today_time = std::chrono::system_clock::to_time_t(p1);
@@ -46,13 +46,15 @@ int main(){
 
 	std::cout << std::endl;
 
-	for (auto ds : datasets) {
+	for (std::string ds : datasets) {
+
+		if (ds == "web-BerkStan.txt") top_k.push_back(std::pow(2,19));
 
 		std::cout << "-------------------" << ds << "---------------------" << std::endl;
 		
 		// InDegree
 		std::cout << "IN_DEGREE" << std::endl;
-		InDegree in_degree = InDegree(top_k, "../dataset/" + ds);
+		InDegree in_degree = InDegree(top_k,"../dataset/" + ds);
 		in_degree.compute();
 		in_degree.print_stats();
 		in_degree.get_topk_results();
@@ -61,7 +63,7 @@ int main(){
 
 		// PageRank
 		std::cout << "PAGE_RANK" << std::endl;
-		PageRank page_rank = PageRank(top_k, "../dataset/" + ds, 0.8);
+		PageRank page_rank = PageRank(top_k,"../dataset/" + ds, 0.8);
 		page_rank.compute();
 		page_rank.print_stats();
 		page_rank.get_topk_results();
@@ -71,7 +73,7 @@ int main(){
 
 		// HITS
 		std::cout << "HITS" << std::endl;
-		HITS hits = HITS(top_k, "../dataset/" + ds);
+		HITS hits = HITS(top_k,"../dataset/" + ds);
 		hits.compute();
 		hits.print_stats();
 		hits.get_topk_hub();
