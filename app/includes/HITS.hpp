@@ -21,12 +21,6 @@ class HITS {
 		// Vector containing the values of k for which the top-k is computed.
 		std::vector<int> top_k;
 
-		// Vector of authority scores at time k.
-    	// std::vector<double> a_k;
-
-    	// Vector of hub scores at time k.
-    	// std::vector<double> h_k;
-
 		// Map: NodeID <-> authority score at time k.
 		std::unordered_map<int, double> HITS_authority;
 

@@ -8,14 +8,13 @@
 
 
 int main(){
-
 	bool verbose;
 
 	std::cout << "--------------------------- PageRank - HITS - InDegree Comparison ---------------------------\n\n";
 	std::cout << "Do you want to activate VERBOSE mode? (0/1) ";
 	std::cin >> verbose;
 
-	if (verbose != 0 && verbose != 1) throw std::invalid_argument("Please insert correct input");
+	if (verbose != 0 && verbose != 1) throw std::invalid_argument("Please insert a correct input");
 
 	std::vector<std::string> datasets = {"web-NotreDame.txt", "web-Stanford.txt", "web-BerkStan.txt", "web-Google.txt"};
 	
@@ -98,11 +97,9 @@ int main(){
 		std::cout << "-------------------" << ds << "---------------------" << std::endl << std::endl;
 	}
 
-
     stream_jaccard.close();
     stream_elapsed.close();
     stream_steps.close();
-
 
 	return 0;
 }

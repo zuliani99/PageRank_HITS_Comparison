@@ -1,6 +1,6 @@
 #include "Graph.hpp"
 
-// Class that takes into account all the computation of the InDegree algorithm
+// This class provides the implementation of the InDegree algorithm 
 class InDegree {
 	public: 
 
@@ -13,13 +13,19 @@ class InDegree {
 			std::stable_sort(this->graph.np_pointer, this->graph.np_pointer + this->graph.nodes, compareBySecondIncreasing);
 		}
 
-		std::vector<int> top_k; // Vector that indicates the top_k value that we have to compute
-		top_k_results<int> IN_topk; // Vector that store the results for each top_k
+		// Vector that indicates the k value for which the top-k ranking is computed
+		std::vector<int> top_k; 
+
+		// Vector that stores the top-k results of the algorithm, for each value of k
+		top_k_results<int> IN_topk; 
 		std::string algo_str = "In Degree"; 
-		std::unordered_map<int, int> In_Deg_Prestige; // Unordered map that memorize the actual InDegree Prestige for each node
+
+		// Unordered map that memorize the actual InDegree Prestige for each node
+		std::unordered_map<int, int> In_Deg_Prestige; 
 		Duration elapsed;
 
-		// Private function declaration
+		// Private functions declaration
+
 		void compute();
 		void get_topk_results();
 		void print_topk_results();
@@ -30,7 +36,7 @@ class InDegree {
 };
 
 
-// Function to compute the InDegree value of each node analysing the edges
+// Computes the InDegree value of each node analysing the edges
 void InDegree::compute() {
 	auto start = now(); // Timer start
 	for(int i = 0; i < this->graph.edges; i++)
@@ -40,7 +46,7 @@ void InDegree::compute() {
 }
 
 
-// Fucntion to compute the top_k nodes based on the InDegree Prestige
+// Computes the top_k nodes based on the InDegree value of each node
 void InDegree::get_topk_results() {
 	this->graph.get_algo_topk_results<int, int>(this->In_Deg_Prestige, this->top_k, this->IN_topk);
 	this->graph.freeMemory();
@@ -48,13 +54,13 @@ void InDegree::get_topk_results() {
 }
 
 
-// Function to print the results
+// Prints the results
 void InDegree::print_topk_results() {
 	this->graph.print_algo_topk_results<int>(this->IN_topk, this->algo_str);
 }
 
 
-// Function to print the elapsed time
+// Prints the elapsed time
 void InDegree::print_stats() {
 	std::cout << "Elapsed: " << this->elapsed.count() << " ms" << std::endl;
 }
