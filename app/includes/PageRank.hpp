@@ -21,7 +21,7 @@ class PageRank {
 		std::vector<int> top_k; 
 
 		// Vector that store the results for each top_k
-		top_k_results<double> PR_topk; 
+		top_k_results PR_topk; 
 
 		// Unordered map that memorize the actual PageRank Prestige for each node
 		std::unordered_map<int, double> PR_Prestige; 
@@ -243,13 +243,13 @@ void PageRank::free_T_matrix_memory(){
 
 // Fucntion to compute the top_k nodes based on the PageRank Prestige
 void PageRank::get_topk_results() {
-	this->graph.get_algo_topk_results<int, double>(this->PR_Prestige, this->top_k, this->PR_topk);
+	this->graph.get_algo_topk_results(this->PR_Prestige, this->top_k, this->PR_topk);
 }
 
 
 // Function to print the results
 void PageRank::print_topk_results() {
-	this->graph.print_algo_topk_results<double>(this->PR_topk, this->algo_str);
+	this->graph.print_algo_topk_results(this->PR_topk, this->algo_str);
 }
 
 

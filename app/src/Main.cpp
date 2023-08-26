@@ -10,8 +10,8 @@
 int main(){
 	bool verbose;
 
-	std::cout << "--------------------------- PageRank - HITS - InDegree Comparison ---------------------------\n\n";
-	std::cout << "Do you want to activate VERBOSE mode? (0/1) ";
+	std::cout << "------------------------------------- PageRank - HITS - InDegree Comparison ------------------------------------- \n\n";
+	std::cout << "Do you want to activate VERBOSE mode to see the top_k nodes fro each k and algorithms? (0/1) ";
 	std::cin >> verbose;
 
 	if (verbose != 0 && verbose != 1) throw std::invalid_argument("Please insert a correct input");
@@ -62,7 +62,7 @@ int main(){
 
 		// PageRank
 		std::cout << "PAGE_RANK" << std::endl;
-		PageRank page_rank = PageRank(top_k,"../dataset/" + ds, 0.8);
+		PageRank page_rank = PageRank(top_k,"../dataset/" + ds, 0.85);
 		page_rank.compute();
 		page_rank.print_stats();
 		page_rank.get_topk_results();

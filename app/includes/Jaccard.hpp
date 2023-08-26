@@ -6,16 +6,16 @@
 // This class provides the implementation of the Jaccard coefficient, which is used to compare the results obtained by the algorithms
 class JaccardCoefficient {
 	public: 
-		JaccardCoefficient(std::vector<int> topk, top_k_results<int> &ID_topk, 
-					top_k_results<double> &PR_topk, top_k_results<double> &HITS_authority_topk, top_k_results<double> &HITS_hub_topk) {
+		JaccardCoefficient(std::vector<int> topk, top_k_results &ID_topk, 
+					top_k_results &PR_topk, top_k_results &HITS_authority_topk, top_k_results &HITS_hub_topk) {
 			this->topk = topk;
 
 			// Retrieves the IDs of the top_k nodes for each top_k results for all the algorithms
-			this->nodes_ID_topk = this->get_first_element_vector<int>(ID_topk);
+			this->nodes_ID_topk = this->get_first_element_vector(ID_topk);
+			this->nodes_PR_topk = this->get_first_element_vector(PR_topk);
+			this->nodes_HITS_authority_topk = this->get_first_element_vector(HITS_authority_topk);
+			this->nodes_HITS_hub_topk = this->get_first_element_vector(HITS_hub_topk);			
 
-			this->nodes_PR_topk = this->get_first_element_vector<double>(PR_topk);
-			this->nodes_HITS_authority_topk = this->get_first_element_vector<double>(HITS_authority_topk);
-			this->nodes_HITS_hub_topk = this->get_first_element_vector<double>(HITS_hub_topk);			
 		}
 
 		// Public functions declaration
@@ -35,18 +35,21 @@ class JaccardCoefficient {
 		std::map<int, std::vector<std::pair<std::string, double>>> jaccard_results;
 
 
-		// Private functions declaration
 
-		template<typename T>
-		std::map<int, std::vector<int>> get_first_element_vector(top_k_results<T> &topk_vector);
+		// Private function declaration
+
+		std::map<int, std::vector<int>> get_first_element_vector(top_k_results &topk_vector);
+
 
 		std::vector<int> intersection(std::vector<int> &v1, std::vector<int> &v2);
 		double jaccard_coefficient(std::vector<int> &v1, std::vector<int> &v2);
 };
 
+
+
 // Retrieves the IDs of the top_k nodes for each top_k results
-template<typename T>
-std::map<int, std::vector<int>> JaccardCoefficient::get_first_element_vector(top_k_results<T> &topk_vector) {
+std::map<int, std::vector<int>> JaccardCoefficient::get_first_element_vector(top_k_results &topk_vector) {
+
 
 	// for each value of k, we store the IDs of the top-k nodes
 	std::map<int, std::vector<int>> jaccard_results;
@@ -57,7 +60,7 @@ std::map<int, std::vector<int>> JaccardCoefficient::get_first_element_vector(top
 		std::vector<int> firstElements(k); 
 
 		std::transform(topk_vector[k].begin(), topk_vector[k].end(), firstElements.begin(),
-						[](const std::pair<int, T> &pair) {
+						[](const std::pair<int, double> &pair) {
 							return pair.first;
 						});
 

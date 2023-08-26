@@ -34,11 +34,9 @@ class Graph {
 
 		void freeMemory();
 
-        template<typename T, typename D>
-        void get_algo_topk_results(std::unordered_map<T, D> iter, std::vector<int>& top_k, top_k_results<D>& algo_topk);
+        void get_algo_topk_results(std::unordered_map<int, double> iter, std::vector<int>& top_k, top_k_results& algo_topk);
 
-        template<typename D>
-        void print_algo_topk_results(top_k_results<D>& algo_topk, std::string& algo_str);
+        void print_algo_topk_results(top_k_results& algo_topk, std::string& algo_str);
 
 	private:
 		std::string ds_path;
@@ -131,21 +129,22 @@ void Graph::freeMemory() {
     	throw std::runtime_error("Free memory failed\n");
 }
 
-// Generic function to obtain the top_k nodes of a given algorithm
-template<typename T, typename D>
-void Graph::get_algo_topk_results(std::unordered_map<T, D> iter, std::vector<int>& topk, top_k_results<D>& algo_topk) {
-    std::vector<std::pair<T, D>> pairs(iter.begin(), iter.end());
-	std::sort(pairs.begin(), pairs.end(), compareBySecondDecreasing<T, D>);
+
+// Function to obtain the top_k nodes of a given algorithm
+void Graph::get_algo_topk_results(std::unordered_map<int, double> iter, std::vector<int>& topk, top_k_results& algo_topk) {
+
+    std::vector<std::pair<int, double>> pairs(iter.begin(), iter.end());
+	std::sort(pairs.begin(), pairs.end(), compareBySecondDecreasing);
 
 	for(int k : topk) {
-		std::vector<std::pair<T, D>> final_top_k(pairs.begin(), pairs.begin() + k); 
+		std::vector<std::pair<int, double>> final_top_k(pairs.begin(), pairs.begin() + k); 
 		algo_topk[k] = final_top_k;
 	}
 }
 
-// Generic function to print the top_k nodes of a given algorithm
-template<typename D>
-void Graph::print_algo_topk_results(top_k_results<D>& algo_topk, std::string& algo_str) {
+
+// Function to print the top_k nodes of a given algorithm
+void Graph::print_algo_topk_results(top_k_results& algo_topk, std::string& algo_str) {
 	for (auto p : algo_topk){
 		std::cout << "Top " << p.first << std::endl;
 		int i = 1;

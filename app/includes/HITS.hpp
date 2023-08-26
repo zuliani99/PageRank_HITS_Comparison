@@ -28,10 +28,10 @@ class HITS {
 		std::unordered_map<int, double> HITS_hub;
 
 		// Vector containing the final top-k authority scores.
-		top_k_results<double> authority_topk;
+		top_k_results authority_topk;
 
 		// Vector containing the final top-k hub scores.
-		top_k_results<double> hub_topk;
+		top_k_results hub_topk;
 		
 		// Number of steps for convergence.
 		int steps = 0;
@@ -302,12 +302,12 @@ void HITS::free_matrices_memory(){
 
 // Function that gets the top-k nodes w.r.t. the authority score.
 void HITS::get_topk_authority() {
-	this->graph.get_algo_topk_results<int, double>(this->HITS_authority, this->top_k, this->authority_topk); 
+	this->graph.get_algo_topk_results(this->HITS_authority, this->top_k, this->authority_topk); 
 }
 
 // Function that gets the top-k nodes w.r.t. the hub score.
 void HITS::get_topk_hub() {
-	this->graph.get_algo_topk_results<int, double>(this->HITS_hub, this->top_k, this->hub_topk); 
+	this->graph.get_algo_topk_results(this->HITS_hub, this->top_k, this->hub_topk); 
 }
 
 // Function that prints the content of the authority vector.
@@ -332,14 +332,14 @@ void HITS::print_hub(){
 void HITS::print_topk_authority() {
 	std::cout << "Authority scores" << std::endl;
 
-	this->graph.print_algo_topk_results<double>(this->authority_topk, this->autority_str); 
+	this->graph.print_algo_topk_results(this->authority_topk, this->autority_str); 
 }
 
 // Function that prints the hub scores for the top-k nodes.
 void HITS::print_topk_hub() {
 	std::cout << "Hub scores" << std::endl;
 
-	this->graph.print_algo_topk_results<double>(this->hub_topk, this->hub_str); 
+	this->graph.print_algo_topk_results(this->hub_topk, this->hub_str); 
 
 }
 

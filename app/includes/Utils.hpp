@@ -21,8 +21,7 @@ using card_map = std::unordered_map<int, int>;
 using traspose_pair = std::pair<double, int>;
 
 // Typedef for the top-k results of each algorithm, for all the values of k 
-template<typename T>
-using top_k_results = std::unordered_map<int, std::vector<std::pair<int, T>>>;
+using top_k_results = std::unordered_map<int, std::vector<std::pair<int, double>>>;
 
 // Time execution statements
 static auto now = std::chrono::high_resolution_clock::now;
@@ -39,9 +38,9 @@ bool compareBySecondIncreasing(const nodes_pair& pair1, const nodes_pair& pair2)
 }
 
 
+
 // Compares the second element of a node pair in decreasiong order
-template<typename T, typename D>
-bool compareBySecondDecreasing(const std::pair<T, D>& pair1, const std::pair<T, D>& pair2) {
+bool compareBySecondDecreasing(const std::pair<int, double>& pair1, const std::pair<int, double>& pair2) {
     return pair1.second > pair2.second;
 }
 

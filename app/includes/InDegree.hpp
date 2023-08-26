@@ -13,15 +13,17 @@ class InDegree {
 			std::stable_sort(this->graph.np_pointer, this->graph.np_pointer + this->graph.nodes, compareBySecondIncreasing);
 		}
 
+
 		// Vector that indicates the k value for which the top-k ranking is computed
 		std::vector<int> top_k; 
 
 		// Vector that stores the top-k results of the algorithm, for each value of k
-		top_k_results<int> IN_topk; 
+		top_k_results IN_topk; 
 		std::string algo_str = "In Degree"; 
 
 		// Unordered map that memorize the actual InDegree Prestige for each node
-		std::unordered_map<int, int> In_Deg_Prestige; 
+		std::unordered_map<int, double> In_Deg_Prestige; 
+
 		Duration elapsed;
 
 		// Private functions declaration
@@ -40,7 +42,7 @@ class InDegree {
 void InDegree::compute() {
 	auto start = now(); // Timer start
 	for(int i = 0; i < this->graph.edges; i++)
-		this->In_Deg_Prestige[this->graph.np_pointer[i].second] += 1;
+		this->In_Deg_Prestige[this->graph.np_pointer[i].second] += 1 / (this->graph.nodes - 1);
 	
 	this->elapsed = now() - start; // Timer end
 }
@@ -48,7 +50,7 @@ void InDegree::compute() {
 
 // Computes the top_k nodes based on the InDegree value of each node
 void InDegree::get_topk_results() {
-	this->graph.get_algo_topk_results<int, int>(this->In_Deg_Prestige, this->top_k, this->IN_topk);
+	this->graph.get_algo_topk_results(this->In_Deg_Prestige, this->top_k, this->IN_topk);
 	this->graph.freeMemory();
 
 }
@@ -56,7 +58,7 @@ void InDegree::get_topk_results() {
 
 // Prints the results
 void InDegree::print_topk_results() {
-	this->graph.print_algo_topk_results<int>(this->IN_topk, this->algo_str);
+	this->graph.print_algo_topk_results(this->IN_topk, this->algo_str);
 }
 
 
