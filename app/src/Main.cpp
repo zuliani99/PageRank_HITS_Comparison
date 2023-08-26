@@ -16,7 +16,7 @@ int main(){
 
 	if (verbose != 0 && verbose != 1) throw std::invalid_argument("Please insert a correct input");
 
-	std::vector<std::string> datasets = {"web-NotreDame.txt", "web-Stanford.txt", "web-BerkStan.txt", "web-Google.txt"};
+	std::vector<std::string> datasets = {"web-BerkStan.txt", "web-Google.txt", "web-NotreDame.txt", "web-Stanford.txt"};
 	
 	std::vector<int> top_k; 
 	for (int i = 0; i<19; i++) top_k.push_back(std::pow(2,i));
