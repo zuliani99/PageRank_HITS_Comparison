@@ -19,7 +19,6 @@ int main(){
 	std::vector<std::string> datasets = {"web-BerkStan.txt", "web-Google.txt", "web-NotreDame.txt", "web-Stanford.txt"};
 	
 	std::vector<int> top_k; 
-	for (int i = 0; i<19; i++) top_k.push_back(std::pow(2,i));
 
 	const auto p1 = std::chrono::system_clock::now();
 	std::time_t today_time = std::chrono::system_clock::to_time_t(p1);
@@ -47,7 +46,10 @@ int main(){
 
 	for (std::string ds : datasets) {
 
-		if (ds == "web-BerkStan.txt") top_k.push_back(std::pow(2,19));
+		top_k.clear();
+		for (int i = 0; i<19; i++) top_k.push_back(std::pow(2,i));
+
+		if (ds == "web-BerkStan.txt" || ds == "web-Google.txt") top_k.push_back(std::pow(2,19));
 
 		std::cout << "-------------------" << ds << "---------------------" << std::endl;
 		
