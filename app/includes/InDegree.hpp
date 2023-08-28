@@ -5,7 +5,7 @@ class InDegree {
 	public: 
 
 		// Constructor
-		InDegree(std::vector<int> top_k, std::string ds_path) {
+		InDegree(std::vector<unsigned int> top_k, std::string ds_path) {
 			this->top_k = top_k;
 			this->graph = Graph(ds_path);
 
@@ -15,14 +15,14 @@ class InDegree {
 
 
 		// Vector that indicates the k value for which the top-k ranking is computed
-		std::vector<int> top_k; 
+		std::vector<unsigned int> top_k; 
 
 		// Vector that stores the top-k results of the algorithm, for each value of k
 		top_k_results IN_topk; 
 		std::string algo_str = "In Degree"; 
 
 		// Unordered map that memorize the actual InDegree Prestige for each node
-		std::unordered_map<int, double> In_Deg_Prestige; 
+		std::unordered_map<unsigned int, double> In_Deg_Prestige; 
 
 		Duration elapsed;
 
@@ -41,7 +41,7 @@ class InDegree {
 // Computes the InDegree value of each node analysing the edges
 void InDegree::compute() {
 	auto start = now(); // Timer start
-	for(int i = 0; i < this->graph.edges; i++)
+	for(unsigned int i = 0; i < this->graph.edges; i++)
 		this->In_Deg_Prestige[this->graph.np_pointer[i].second] += 1 / (this->graph.nodes - 1);
 	
 	this->elapsed = now() - start; // Timer end

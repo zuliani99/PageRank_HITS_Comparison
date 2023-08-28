@@ -6,7 +6,7 @@
 // This class provides the implementation of the Jaccard coefficient, which is used to compare the results obtained by the algorithms
 class JaccardCoefficient {
 	public: 
-		JaccardCoefficient(std::vector<int> topk, top_k_results &ID_topk, 
+		JaccardCoefficient(std::vector<unsigned int> topk, top_k_results &ID_topk, 
 					top_k_results &PR_topk, top_k_results &HITS_authority_topk, top_k_results &HITS_hub_topk) {
 			this->topk = topk;
 
@@ -25,42 +25,42 @@ class JaccardCoefficient {
 		void save_results(std::fstream &stream_jaccard, std::string &ds);
 
 	private:
-		std::map<int, std::vector<int>> nodes_ID_topk;
-		std::map<int, std::vector<int>> nodes_PR_topk;
-		std::map<int, std::vector<int>> nodes_HITS_authority_topk;
-		std::map<int, std::vector<int>> nodes_HITS_hub_topk;
-		std::vector<int> topk;
+		std::map<unsigned int, std::vector<unsigned int>> nodes_ID_topk;
+		std::map<unsigned int, std::vector<unsigned int>> nodes_PR_topk;
+		std::map<unsigned int, std::vector<unsigned int>> nodes_HITS_authority_topk;
+		std::map<unsigned int, std::vector<unsigned int>> nodes_HITS_hub_topk;
+		std::vector<unsigned int> topk;
 
 		// 		<k		,	<'Algo1_Algo2', res		>>
-		std::map<int, std::vector<std::pair<std::string, double>>> jaccard_results;
+		std::map<unsigned int, std::vector<std::pair<std::string, double>>> jaccard_results;
 
 
 
 		// Private function declaration
 
-		std::map<int, std::vector<int>> get_first_element_vector(top_k_results &topk_vector);
+		std::map<unsigned int, std::vector<unsigned int>> get_first_element_vector(top_k_results &topk_vector);
 
 
-		std::vector<int> intersection(std::vector<int> &v1, std::vector<int> &v2);
-		double jaccard_coefficient(std::vector<int> &v1, std::vector<int> &v2);
+		std::vector<unsigned int> intersection(std::vector<unsigned int> &v1, std::vector<unsigned int> &v2);
+		double jaccard_coefficient(std::vector<unsigned int> &v1, std::vector<unsigned int> &v2);
 };
 
 
 
 // Retrieves the IDs of the top_k nodes for each top_k results
-std::map<int, std::vector<int>> JaccardCoefficient::get_first_element_vector(top_k_results &topk_vector) {
+std::map<unsigned int, std::vector<unsigned int>> JaccardCoefficient::get_first_element_vector(top_k_results &topk_vector) {
 
 
 	// for each value of k, we store the IDs of the top-k nodes
-	std::map<int, std::vector<int>> jaccard_results;
+	std::map<unsigned int, std::vector<unsigned int>> jaccard_results;
 
-	for(int k : this->topk) {
+	for(unsigned int k : this->topk) {
 
 		// initialize the IDs vector with size k
-		std::vector<int> firstElements(k); 
+		std::vector<unsigned int> firstElements(k); 
 
 		std::transform(topk_vector[k].begin(), topk_vector[k].end(), firstElements.begin(),
-						[](const std::pair<int, double> &pair) {
+						[](const std::pair<unsigned int, double> &pair) {
 							return pair.first;
 						});
 
@@ -72,8 +72,8 @@ std::map<int, std::vector<int>> JaccardCoefficient::get_first_element_vector(top
 }
 
 // Computes the intersection between two given vectors
-std::vector<int> JaccardCoefficient::intersection(std::vector<int> &v1, std::vector<int> &v2) {
-    std::vector<int> intersect;
+std::vector<unsigned int> JaccardCoefficient::intersection(std::vector<unsigned int> &v1, std::vector<unsigned int> &v2) {
+    std::vector<unsigned int> intersect;
 
 	std::stable_sort(v1.begin(), v1.end());
 	std::stable_sort(v2.begin(), v2.end());
@@ -86,7 +86,7 @@ std::vector<int> JaccardCoefficient::intersection(std::vector<int> &v1, std::vec
 }
 
 // Returns the Jaccard index of two sets
-double JaccardCoefficient::jaccard_coefficient(std::vector<int> &v1, std::vector<int> &v2) {
+double JaccardCoefficient::jaccard_coefficient(std::vector<unsigned int> &v1, std::vector<unsigned int> &v2) {
 
     // get the cardinality of the intersection 
     double size_in = this->intersection(v1, v2).size();
@@ -97,7 +97,7 @@ double JaccardCoefficient::jaccard_coefficient(std::vector<int> &v1, std::vector
 
 // Computes the actual Jaccard coefficient between all the possible pairs of algorithm
 void JaccardCoefficient::obtain_results() {
-	for (int k : this->topk) {
+	for (unsigned int k : this->topk) {
 		std::vector<std::pair<std::string, double>> temp_res;
 
 		// ID_HITS

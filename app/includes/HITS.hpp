@@ -3,7 +3,7 @@
 // This class provides the implementation of the HITS algorithm.
 class HITS {
 	public: 
-		HITS(std::vector<int> top_k, std::string ds_path){
+		HITS(std::vector<unsigned int> top_k, std::string ds_path){
 			this->top_k = top_k;
 			this->graph = Graph(ds_path);
 			// std::cout << "Number of nodes " << this->graph.nodes << "\n";
@@ -19,13 +19,13 @@ class HITS {
 		}
 
 		// Vector containing the values of k for which the top-k is computed.
-		std::vector<int> top_k;
+		std::vector<unsigned int> top_k;
 
 		// Map: NodeID <-> authority score at time k.
-		std::unordered_map<int, double> HITS_authority;
+		std::unordered_map<unsigned int, double> HITS_authority;
 
 		// Map: NodeID <-> hub score at time k.
-		std::unordered_map<int, double> HITS_hub;
+		std::unordered_map<unsigned int, double> HITS_hub;
 
 		// Vector containing the final top-k authority scores.
 		top_k_results authority_topk;
@@ -61,25 +61,30 @@ class HITS {
     	unsigned int* L_ptr;
 
 		// Stores the index of a new row of L
-    	std::vector<unsigned int> row_ptr_L;
+    	//std::vector<unsigned int> row_ptr_L;
 
 		// Stores the empty line in L
-    	std::vector<unsigned int> row_ptr_not_empty_L;
+    	//std::vector<unsigned int> row_ptr_not_empty_L;
+
+		std::vector<std::pair<unsigned int, unsigned int>> row_ptr_nempty_L;
 
 		// Pointer to the destination nodes of the transpose od the adjacency matrix L, L_t
     	unsigned int* L_t_ptr;
 
     	// Stores the index of a new row of L_t
-    	std::vector<unsigned int> row_ptr_L_t;
+    	//std::vector<unsigned int> row_ptr_L_t;
 
     	// Stores the empty line in L_t
-    	std::vector<unsigned int> row_ptr_not_empty_L_t;
+    	//std::vector<unsigned int> row_ptr_not_empty_L_t;
+
+		std::vector<std::pair<unsigned int, unsigned int>> row_ptr_nempty_L_t;
+
 
 		std::string autority_str = "Authority"; 
 		std::string hub_str = "Hub"; 
 
-		bool converge(std::unordered_map<int, double> &temp_a, std::unordered_map<int,double> &temp_h);
-		void normalize(std::unordered_map<int, double> &ak, std::unordered_map<int, double> &hk);
+		bool converge(std::unordered_map<unsigned int, double> &temp_a, std::unordered_map<unsigned int,double> &temp_h);
+		void normalize(std::unordered_map<unsigned int, double> &ak, std::unordered_map<unsigned int, double> &hk);
 };
 
 // Function that computes the adjacency matrix L.
@@ -89,25 +94,32 @@ void HITS::compute_L(){
 	this->L_ptr = (unsigned int*)mmap(NULL, this->graph.edges * sizeof(unsigned int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
 
 	// checking the allocation
-	if (L_ptr == MAP_FAILED){
+	if (L_ptr == MAP_FAILED)
 		throw std::runtime_error("Mapping failed\n");
-	}
+	
 
-	this->row_ptr_L.push_back(0);
-	this->row_ptr_not_empty_L.push_back(this->graph.np_pointer[0].first - this->graph.min_node);
+	//this->row_ptr_L.push_back(0);
+	//this->row_ptr_not_empty_L.push_back(this->graph.np_pointer[0].first - this->graph.min_node);
 
 	// std::cout << "row_ptr_L = " << row_ptr_L[0] << "\n";
 	// std::cout << "row_ptr_not_empty_L = " << row_ptr_not_empty_L[0] << "\n";
 
 	// computing L, the adjacency matrix
 	for (unsigned int i = 0; i < this->graph.edges; i++){
-		if (i > 0 && this->graph.np_pointer[i - 1].first != this->graph.np_pointer[i].first){
-			this->row_ptr_L.push_back(i);
-			this->row_ptr_not_empty_L.push_back(this->graph.np_pointer[i].first - this->graph.min_node);
-		}
+		//if (i > 0 && this->graph.np_pointer[i - 1].first != this->graph.np_pointer[i].first){
+			//this->row_ptr_L.push_back(i);
+			//this->row_ptr_not_empty_L.push_back(this->graph.np_pointer[i].first - this->graph.min_node);
+		//}
+		if(i == 0 || this->graph.np_pointer[i - 1].first != this->graph.np_pointer[i].first)
+			// Add the row pointer and the non empty row pointer in the vector of pow pointers pairs
+			this->row_ptr_nempty_L.push_back(std::make_pair(i, this->graph.np_pointer[i].first - this->graph.min_node));
+
 		this->L_ptr[i] = this->graph.np_pointer[i].second;
 	}
-	this->row_ptr_L.push_back(this->graph.edges);
+	//this->row_ptr_L.push_back(this->graph.edges);
+	this->row_ptr_nempty_L.push_back(std::make_pair(this->graph.edges, this->graph.edges)); // Notify the conclusion of out transpose matrix
+
+
 
 	// std::cout << "DEBUG" << "\n";
 	// for (int i = 0; i<8; i++){
@@ -130,22 +142,26 @@ void HITS::compute_L_t(){
 	this->L_t_ptr = (unsigned int*)mmap(NULL, this->graph.edges * sizeof(unsigned int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, 0, 0);
 	
 	// checking the allocation
-	if (L_t_ptr == MAP_FAILED){
+	if (L_t_ptr == MAP_FAILED)
 		throw std::runtime_error("Mapping failed\n");
-	}
+	
 
-	this->row_ptr_L_t.push_back(0);
-	this->row_ptr_not_empty_L_t.push_back(this->graph.np_pointer[0].second - this->graph.min_node);
+	//this->row_ptr_L_t.push_back(0);
+	//this->row_ptr_not_empty_L_t.push_back(this->graph.np_pointer[0].second - this->graph.min_node);
 	
 	// computing L_t, the transpose of the adjacency matrix
 	for (unsigned int i = 0; i < this->graph.edges; i++){
-		if (i > 0 && this->graph.np_pointer[i - 1].second != this->graph.np_pointer[i].second){
-			this->row_ptr_L_t.push_back(i);
-			this->row_ptr_not_empty_L_t.push_back(this->graph.np_pointer[i].second - this->graph.min_node);
-		}
+		//if (i > 0 && this->graph.np_pointer[i - 1].second != this->graph.np_pointer[i].second){
+			//this->row_ptr_L_t.push_back(i);
+			//this->row_ptr_not_empty_L_t.push_back(this->graph.np_pointer[i].second - this->graph.min_node);
+		//}
+		if(i == 0 || this->graph.np_pointer[i - 1].second != this->graph.np_pointer[i].second)
+			// Add the row pointer and the non empty row pointer in the vector of pow pointers pairs
+			this->row_ptr_nempty_L_t.push_back(std::make_pair(i, this->graph.np_pointer[i].second - this->graph.min_node));
+
 		this->L_t_ptr[i] = this->graph.np_pointer[i].first;
 	}
-	this->row_ptr_L_t.push_back(this->graph.edges);
+	this->row_ptr_nempty_L_t.push_back(std::make_pair(this->graph.edges, this->graph.edges));
 
 	// std::cout << "DEBUG" << "\n";
 	// for (int i = 0; i<8; i++){
@@ -178,8 +194,8 @@ void HITS::create_L_and_L_t(){
 
 // Function that initializes authority and hub vectors.
 void HITS::initialize_ak_hk(){
-	for (int i = 0; i < this->graph.nodes; i++) this->HITS_authority[i] = 1.;
-	for (int i = 0; i < this->graph.nodes; i++) this->HITS_hub[i] = 1.;
+	for (unsigned int i = 0; i < this->graph.nodes; i++) this->HITS_authority[i] = 1.;
+	for (unsigned int i = 0; i < this->graph.nodes; i++) this->HITS_hub[i] = 1.;
 }
 
 // Function that computes autority and hub vectors.
@@ -187,12 +203,12 @@ void HITS::compute(){
     this->steps = 0;
 
 	// authority scores at time k+1
-    std::unordered_map<int, double> temp_HITS_authority;
-	for (int i = 0; i < this->graph.nodes; i++) temp_HITS_authority[i] = 1.;
+    std::unordered_map<unsigned int, double> temp_HITS_authority;
+	for (unsigned int i = 0; i < this->graph.nodes; i++) temp_HITS_authority[i] = 1.;
 
 	// hub scores at time k+1
-	std::unordered_map<int, double> temp_HITS_hub;
-	for (int i = 0; i < this->graph.nodes; i++) temp_HITS_hub[i] = 1.;
+	std::unordered_map<unsigned int, double> temp_HITS_hub;
+	for (unsigned int i = 0; i < this->graph.nodes; i++) temp_HITS_hub[i] = 1.;
 
 	auto start = now();
 
@@ -204,14 +220,14 @@ void HITS::compute(){
 		// hub score
     	// h_k = L * a_k-1
 
-        unsigned int tmp_pos_row = 0;
-        unsigned int next_starting_row = this->row_ptr_L[1];
+        unsigned int row_ptr = 0;
+        unsigned int next_row_ptr = this->row_ptr_nempty_L[row_ptr + 1].first;
         for (unsigned int i = 0; i < this->graph.edges; i++){
-            if (i == next_starting_row){
-                tmp_pos_row++;
-                next_starting_row = this->row_ptr_L[tmp_pos_row + 1];
+            if (i == next_row_ptr){
+                row_ptr++;
+                next_row_ptr = this->row_ptr_nempty_L[row_ptr + 1].first;
             }
-			temp_HITS_hub[this->row_ptr_not_empty_L[tmp_pos_row]] += 1 * this->HITS_authority[this->L_ptr[i]];
+			temp_HITS_hub[this->row_ptr_nempty_L[row_ptr].second] += 1 * this->HITS_authority[this->L_ptr[i]];
         }
 
 		// std::cout << "hub = [";
@@ -223,14 +239,14 @@ void HITS::compute(){
         // authority score
 		// a_k = L^t * h_k-1
 
-        tmp_pos_row = 0;
-        next_starting_row = this->row_ptr_L_t[1];
+        row_ptr = 0;
+        next_row_ptr = this->row_ptr_nempty_L_t[row_ptr + 1].first;
         for (unsigned int i = 0; i < this->graph.edges; i++){
-            if (i == next_starting_row){
-                tmp_pos_row++;
-                next_starting_row = this->row_ptr_L_t[tmp_pos_row + 1];
+            if (i == next_row_ptr){
+                row_ptr++;
+                next_row_ptr = this->row_ptr_nempty_L_t[row_ptr + 1].first;
             }
-			temp_HITS_authority[this->row_ptr_not_empty_L_t[tmp_pos_row]] += 1 * this->HITS_hub[this->L_t_ptr[i]];
+			temp_HITS_authority[this->row_ptr_nempty_L_t[row_ptr].second] += 1 * this->HITS_hub[this->L_t_ptr[i]];
 		}
 
 		// std::cout << "authority = [";
@@ -259,14 +275,14 @@ void HITS::compute(){
 }
 
 // Function that establishes whether the execution of the HITS algorithm should continue or not.
-bool HITS::converge(std::unordered_map<int, double> &temp_a, std::unordered_map<int,double> &temp_h){
+bool HITS::converge(std::unordered_map<unsigned int, double> &temp_a, std::unordered_map<unsigned int, double> &temp_h){
 	double distance_a = 0.;
 	double distance_h = 0.;
 
-	for (int i = 0; i < temp_a.size(); i++) 
+	for (unsigned int i = 0; i < temp_a.size(); i++) 
 		distance_a += std::pow(std::abs(this->HITS_authority[i] - temp_a[i]), 2.);
 
-	for (int i = 0; i < temp_h.size(); i++) 
+	for (unsigned int i = 0; i < temp_h.size(); i++) 
 		distance_h += std::pow(std::abs(this->HITS_hub[i] - temp_h[i]), 2.);
 
 	this->HITS_authority = temp_a;
@@ -276,16 +292,16 @@ bool HITS::converge(std::unordered_map<int, double> &temp_a, std::unordered_map<
 }
 
 // Function that normalizes the vectors in order to obtain a probability distribution.
-void HITS::normalize(std::unordered_map<int, double> &ak, std::unordered_map<int, double> &hk){
+void HITS::normalize(std::unordered_map<unsigned int, double> &ak, std::unordered_map<unsigned int, double> &hk){
 	double sum_a_k = 0.0;
 	double sum_h_k = 0.0;
 	
-	for (int i = 0; i < this->graph.nodes; i++){
+	for (unsigned int i = 0; i < this->graph.nodes; i++){
 		sum_a_k += ak[i];
 		sum_h_k += hk[i];
 	}
 
-	for (int i = 0; i < this->graph.nodes; i++){
+	for (unsigned int i = 0; i < this->graph.nodes; i++){
 		ak[i] = ak[i] / sum_a_k;
 		hk[i] = hk[i] / sum_h_k;
 	}

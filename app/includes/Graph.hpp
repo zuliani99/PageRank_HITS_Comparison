@@ -34,7 +34,7 @@ class Graph {
 
 		void freeMemory();
 
-        void get_algo_topk_results(std::unordered_map<int, double> iter, std::vector<int>& top_k, top_k_results& algo_topk);
+        void get_algo_topk_results(std::unordered_map<unsigned int, double> iter, std::vector<unsigned int>& top_k, top_k_results& algo_topk);
 
         void print_algo_topk_results(top_k_results& algo_topk, std::string& algo_str);
 
@@ -131,13 +131,13 @@ void Graph::freeMemory() {
 
 
 // Function to obtain the top_k nodes of a given algorithm
-void Graph::get_algo_topk_results(std::unordered_map<int, double> iter, std::vector<int>& topk, top_k_results& algo_topk) {
+void Graph::get_algo_topk_results(std::unordered_map<unsigned int, double> iter, std::vector<unsigned int>& topk, top_k_results& algo_topk) {
 
-    std::vector<std::pair<int, double>> pairs(iter.begin(), iter.end());
+    std::vector<std::pair<unsigned int, double>> pairs(iter.begin(), iter.end());
 	std::sort(pairs.begin(), pairs.end(), compareBySecondDecreasing);
 
 	for(int k : topk) {
-		std::vector<std::pair<int, double>> final_top_k(pairs.begin(), pairs.begin() + k); 
+		std::vector<std::pair<unsigned int, double>> final_top_k(pairs.begin(), pairs.begin() + k); 
 		algo_topk[k] = final_top_k;
 	}
 }
