@@ -3,19 +3,12 @@
 // This class provides the implementation of the HITS algorithm.
 class HITS {
 	public: 
+		// HITS constructor.
 		HITS(std::vector<unsigned int> top_k, std::string ds_path){
 			this->top_k = top_k;
 			this->graph = Graph(ds_path);
-			// std::cout << "Number of nodes " << this->graph.nodes << "\n";
-			// std::cout << "Number of edges " << this->graph.edges << "\n";
-			// std::cout << "Min node " << this->graph.min_node << "\n";
-			// std::cout << "Max node " << this->graph.max_node << "\n";
-			// std::cout << "Creating the adjacency matrix L and its transpose.." << "\n";
 			this->create_L_and_L_t();
-			// std::cout << "Initializing a_k and h_k.." << "\n";
 			this->initialize_ak_hk();
-			// this->print_authority();
-			// this->print_hub();
 		}
 
 		// Vector containing the values of k for which the top-k is computed.
@@ -38,6 +31,8 @@ class HITS {
 
 		// Elapsed time for computation.
 		Duration elapsed;
+
+		// Public functions declaration
 		
 		void compute_L();
 		void compute_L_t();
@@ -54,34 +49,26 @@ class HITS {
 		void free_matrices_memory();
 
 	private:
-		// Stores the graph for which the HITS is computed
+		// Stores the graph for which the HITS is computed.
 		Graph graph;
 
-		// Pointer to the destination nodes of the adjacency matrix L
+		// Pointer to the destination nodes of the adjacency matrix L.
     	unsigned int* L_ptr;
-
-		// Stores the index of a new row of L
-    	//std::vector<unsigned int> row_ptr_L;
-
-		// Stores the empty line in L
-    	//std::vector<unsigned int> row_ptr_not_empty_L;
 
 		std::vector<std::pair<unsigned int, unsigned int>> row_ptr_nempty_L;
 
-		// Pointer to the destination nodes of the transpose od the adjacency matrix L, L_t
+		// Pointer to the destination nodes of the transpose od the adjacency matrix L, L_t.
     	unsigned int* L_t_ptr;
 
-    	// Stores the index of a new row of L_t
-    	//std::vector<unsigned int> row_ptr_L_t;
-
-    	// Stores the empty line in L_t
-    	//std::vector<unsigned int> row_ptr_not_empty_L_t;
-
 		std::vector<std::pair<unsigned int, unsigned int>> row_ptr_nempty_L_t;
-
-
+		
+		// String for authority.
 		std::string autority_str = "Authority"; 
+
+		// String for hub.
 		std::string hub_str = "Hub"; 
+
+		// Private functions declaration
 
 		bool converge(std::unordered_map<unsigned int, double> &temp_a, std::unordered_map<unsigned int,double> &temp_h);
 		void normalize(std::unordered_map<unsigned int, double> &ak, std::unordered_map<unsigned int, double> &hk);
@@ -97,42 +84,18 @@ void HITS::compute_L(){
 	if (L_ptr == MAP_FAILED)
 		throw std::runtime_error("Mapping failed\n");
 	
-
-	//this->row_ptr_L.push_back(0);
-	//this->row_ptr_not_empty_L.push_back(this->graph.np_pointer[0].first - this->graph.min_node);
-
-	// std::cout << "row_ptr_L = " << row_ptr_L[0] << "\n";
-	// std::cout << "row_ptr_not_empty_L = " << row_ptr_not_empty_L[0] << "\n";
-
 	// computing L, the adjacency matrix
 	for (unsigned int i = 0; i < this->graph.edges; i++){
-		//if (i > 0 && this->graph.np_pointer[i - 1].first != this->graph.np_pointer[i].first){
-			//this->row_ptr_L.push_back(i);
-			//this->row_ptr_not_empty_L.push_back(this->graph.np_pointer[i].first - this->graph.min_node);
-		//}
 		if(i == 0 || this->graph.np_pointer[i - 1].first != this->graph.np_pointer[i].first)
-			// Add the row pointer and the non empty row pointer in the vector of pow pointers pairs
+
+			// adding the row pointer and the non empty row pointer in the vector of pow pointers pairs
 			this->row_ptr_nempty_L.push_back(std::make_pair(i, this->graph.np_pointer[i].first - this->graph.min_node));
 
 		this->L_ptr[i] = this->graph.np_pointer[i].second;
 	}
-	//this->row_ptr_L.push_back(this->graph.edges);
-	this->row_ptr_nempty_L.push_back(std::make_pair(this->graph.edges, this->graph.edges)); // Notify the conclusion of out transpose matrix
 
-
-
-	// std::cout << "DEBUG" << "\n";
-	// for (int i = 0; i<8; i++){
-	// 	std::cout << "L_ptr[" << i << "] = " << this->L_ptr[i] << "\n";
-	// }
-
-	// for (int i = 0; i<this->row_ptr_L.size(); i++){
-	// 	std::cout << "row_ptr_L[" << i << "] = " << this->row_ptr_L[i] << "\n";
-	// }
-
-	// for (int i = 0; i<this->row_ptr_not_empty_L.size(); i++){
-	// 	std::cout << "row_ptr_not_empty_L[" << i << "] = " << this->row_ptr_not_empty_L[i] << "\n";
-	// }
+	// notifying the conclusion 
+	this->row_ptr_nempty_L.push_back(std::make_pair(this->graph.edges, this->graph.edges)); 
 }
 
 // Function that computes the transpose matrix of the adjacency matrix L, L_t.
@@ -144,37 +107,19 @@ void HITS::compute_L_t(){
 	// checking the allocation
 	if (L_t_ptr == MAP_FAILED)
 		throw std::runtime_error("Mapping failed\n");
-	
-
-	//this->row_ptr_L_t.push_back(0);
-	//this->row_ptr_not_empty_L_t.push_back(this->graph.np_pointer[0].second - this->graph.min_node);
-	
+		
 	// computing L_t, the transpose of the adjacency matrix
 	for (unsigned int i = 0; i < this->graph.edges; i++){
-		//if (i > 0 && this->graph.np_pointer[i - 1].second != this->graph.np_pointer[i].second){
-			//this->row_ptr_L_t.push_back(i);
-			//this->row_ptr_not_empty_L_t.push_back(this->graph.np_pointer[i].second - this->graph.min_node);
-		//}
 		if(i == 0 || this->graph.np_pointer[i - 1].second != this->graph.np_pointer[i].second)
-			// Add the row pointer and the non empty row pointer in the vector of pow pointers pairs
+
+			// adding the row pointer and the non empty row pointer in the vector of pow pointers pairs
 			this->row_ptr_nempty_L_t.push_back(std::make_pair(i, this->graph.np_pointer[i].second - this->graph.min_node));
 
 		this->L_t_ptr[i] = this->graph.np_pointer[i].first;
 	}
+
+	// notifying the conclusion 
 	this->row_ptr_nempty_L_t.push_back(std::make_pair(this->graph.edges, this->graph.edges));
-
-	// std::cout << "DEBUG" << "\n";
-	// for (int i = 0; i<8; i++){
-	// 	std::cout << "L_t_ptr[" << i << "] = " << this->L_t_ptr[i] << "\n";
-	// }
-
-	// for (int i = 0; i<this->row_ptr_L_t.size(); i++){
-	// 	std::cout << "row_ptr_L_t[" << i << "] = " << this->row_ptr_L_t[i] << "\n";
-	// }
-
-	// for (int i = 0; i<this->row_ptr_not_empty_L_t.size(); i++){
-	// 	std::cout << "row_ptr_not_empty_L_t[" << i << "] = " << this->row_ptr_not_empty_L_t[i] << "\n";
-	// }
 }
 
 // Function that creates L and L_t and that performs the two matrix multiplications.
@@ -214,7 +159,6 @@ void HITS::compute(){
 
 	// repeat until convergence
     do {
-		// std::cout << "DEBUG\n step = " << steps << "\n";
         this->steps++;
 
 		// hub score
@@ -230,12 +174,6 @@ void HITS::compute(){
 			temp_HITS_hub[this->row_ptr_nempty_L[row_ptr].second] += 1 * this->HITS_authority[this->L_ptr[i]];
         }
 
-		// std::cout << "hub = [";
-		// for (int i = 0; i<temp_HITS_hub.size(); i++){
-		// 	std::cout << temp_HITS_hub[i] << ", ";
-		// }
-		// std::cout << "]\n";
-
         // authority score
 		// a_k = L^t * h_k-1
 
@@ -249,26 +187,7 @@ void HITS::compute(){
 			temp_HITS_authority[this->row_ptr_nempty_L_t[row_ptr].second] += 1 * this->HITS_hub[this->L_t_ptr[i]];
 		}
 
-		// std::cout << "authority = [";
-		// for (int i = 0; i<temp_HITS_authority.size(); i++){
-		// 	std::cout << temp_HITS_authority[i] << ", ";
-		// }
-		// std::cout << "]\n";
-
-        this->normalize(temp_HITS_authority, temp_HITS_hub);
-		
-		/*std::cout << "After normalization\n";
-		std::cout << "hub = [";
-		for (int i = 0; i<temp_HITS_hub.size(); i++){
-		 	std::cout << temp_HITS_hub[i] << ", ";
-		}
-		std::cout << "]\n";
-		std::cout << "authority = [";
-		for (int i = 0; i<temp_HITS_authority.size(); i++){
-		 	std::cout << temp_HITS_authority[i] << ", ";
-		}
-		std::cout << "]\n\n";*/
-		
+        this->normalize(temp_HITS_authority, temp_HITS_hub);		
     } while (this->converge(temp_HITS_authority, temp_HITS_hub));
 	
 	this->elapsed = now() - start;
@@ -347,16 +266,13 @@ void HITS::print_hub(){
 // Function that prints the authority scores for the top-k nodes.
 void HITS::print_topk_authority() {
 	std::cout << "Authority scores" << std::endl;
-
 	this->graph.print_algo_topk_results(this->authority_topk, this->autority_str); 
 }
 
 // Function that prints the hub scores for the top-k nodes.
 void HITS::print_topk_hub() {
 	std::cout << "Hub scores" << std::endl;
-
 	this->graph.print_algo_topk_results(this->hub_topk, this->hub_str); 
-
 }
 
 // Function that prints the execution time and the number of steps taken by the HITS algorithm to converge.

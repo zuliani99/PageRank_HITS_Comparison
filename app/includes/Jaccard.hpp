@@ -3,19 +3,18 @@
 
 #include "./Utils.hpp"
 
-// This class provides the implementation of the Jaccard coefficient, which is used to compare the results obtained by the algorithms
+// This class provides the implementation of the Jaccard coefficient, which is used to compare the results obtained by the algorithms.
 class JaccardCoefficient {
 	public: 
-		JaccardCoefficient(std::vector<unsigned int> topk, top_k_results &ID_topk, 
-					top_k_results &PR_topk, top_k_results &HITS_authority_topk, top_k_results &HITS_hub_topk) {
+		// JaccardCoefficient constructor.
+		JaccardCoefficient(std::vector<unsigned int> topk, top_k_results &ID_topk, top_k_results &PR_topk, top_k_results &HITS_authority_topk, top_k_results &HITS_hub_topk) {
 			this->topk = topk;
 
-			// Retrieves the IDs of the top_k nodes for each top_k results for all the algorithms
+			// retrieving the IDs of the top_k nodes for each top_k results for all the algorithms
 			this->nodes_ID_topk = this->get_first_element_vector(ID_topk);
 			this->nodes_PR_topk = this->get_first_element_vector(PR_topk);
 			this->nodes_HITS_authority_topk = this->get_first_element_vector(HITS_authority_topk);
 			this->nodes_HITS_hub_topk = this->get_first_element_vector(HITS_hub_topk);			
-
 		}
 
 		// Public functions declaration
@@ -34,29 +33,22 @@ class JaccardCoefficient {
 		// 		<k		,	<'Algo1_Algo2', res		>>
 		std::map<unsigned int, std::vector<std::pair<std::string, double>>> jaccard_results;
 
-
-
 		// Private function declaration
 
 		std::map<unsigned int, std::vector<unsigned int>> get_first_element_vector(top_k_results &topk_vector);
-
-
 		std::vector<unsigned int> intersection(std::vector<unsigned int> &v1, std::vector<unsigned int> &v2);
 		double jaccard_coefficient(std::vector<unsigned int> &v1, std::vector<unsigned int> &v2);
 };
 
-
-
-// Retrieves the IDs of the top_k nodes for each top_k results
+// Function that retrieves the IDs of the top_k nodes for each top_k results.
 std::map<unsigned int, std::vector<unsigned int>> JaccardCoefficient::get_first_element_vector(top_k_results &topk_vector) {
-
 
 	// for each value of k, we store the IDs of the top-k nodes
 	std::map<unsigned int, std::vector<unsigned int>> jaccard_results;
 
 	for(unsigned int k : this->topk) {
 
-		// initialize the IDs vector with size k
+		// initializing the IDs vector with size k
 		std::vector<unsigned int> firstElements(k); 
 
 		std::transform(topk_vector[k].begin(), topk_vector[k].end(), firstElements.begin(),
@@ -64,38 +56,36 @@ std::map<unsigned int, std::vector<unsigned int>> JaccardCoefficient::get_first_
 							return pair.first;
 						});
 
-		// set the array on the k unordered map position
+		// setting the array on the k unordered map position
 		jaccard_results[k] = firstElements; 
 	}
-
 	return jaccard_results;
 }
 
-// Computes the intersection between two given vectors
+// Function that computes the intersection between two given vectors.
 std::vector<unsigned int> JaccardCoefficient::intersection(std::vector<unsigned int> &v1, std::vector<unsigned int> &v2) {
     std::vector<unsigned int> intersect;
 
 	std::stable_sort(v1.begin(), v1.end());
 	std::stable_sort(v2.begin(), v2.end());
  
-    // find the intersection of the two sets
-    std::set_intersection(v1.begin(), v1.end(), v2.begin(), v2.end(), 
-			std::inserter(intersect, intersect.begin()));
+    // finding the intersection of the two sets
+    std::set_intersection(v1.begin(), v1.end(), v2.begin(), v2.end(), std::inserter(intersect, intersect.begin()));
  
     return intersect;
 }
 
-// Returns the Jaccard index of two sets
+// Function that returns the Jaccard index of two sets.
 double JaccardCoefficient::jaccard_coefficient(std::vector<unsigned int> &v1, std::vector<unsigned int> &v2) {
 
-    // get the cardinality of the intersection 
+    // getting the cardinality of the intersection 
     double size_in = this->intersection(v1, v2).size();
  
     // return the jaccard coefficient 
     return size_in / (v1.size() + v2.size() - size_in);
 }
 
-// Computes the actual Jaccard coefficient between all the possible pairs of algorithm
+// Function that computes the actual Jaccard coefficient between all the possible pairs of algorithm.
 void JaccardCoefficient::obtain_results() {
 	for (unsigned int k : this->topk) {
 		std::vector<std::pair<std::string, double>> temp_res;
@@ -118,7 +108,7 @@ void JaccardCoefficient::obtain_results() {
 	}
 }
 
-// Prints the results
+// Function that prints the results.
 void JaccardCoefficient::print_results() {
 	for(auto pair1 : this->jaccard_results) {
 		std::cout << "TOP " << pair1.first;
@@ -128,7 +118,7 @@ void JaccardCoefficient::print_results() {
 	}
 }
 
-// Saves the jaccard coefficients in a .csv file
+// Function that saves the jaccard coefficients in a .csv file.
 void JaccardCoefficient::save_results(std::fstream &stream_jaccard, std::string &ds) {
 	for(auto pair1 : this->jaccard_results) {
 		stream_jaccard << ds << "," << pair1.first;

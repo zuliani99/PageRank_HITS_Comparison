@@ -8,13 +8,13 @@
 #include <cmath>
 
 
-// Class that describes the general behaviour that a graph has, with relative generic functions
+// Class that describes the general behaviour that a graph has, with relative generic functions.
 class Graph {
 	public:
-		// Default constructor
+		// Default constructor.
 		Graph() { };
 
-		// Graph constructor
+		// Graph constructor.
 		Graph(std::string ds_path) {
 			this->ds_path = ds_path;
 			this->set_nodes_edges(ds_path);
@@ -26,7 +26,7 @@ class Graph {
 		int min_node = INT32_MAX;
 		int max_node = 0;
 
-		// Pointer to nodes_pair to start memorizing edges
+		// Pointer to nodes_pair to start memorizing edges.
 		nodes_pair* np_pointer; 
 
 
@@ -49,7 +49,7 @@ class Graph {
 		void updateMinMaxNodes(const std::vector<int>& pair);
 };
 
-// Reads the file and gets the number of nodes and edges from the description
+// Function that reads the file and gets the number of nodes and edges from the description.
 void Graph::set_nodes_edges(const std::string& ds_path) { 
 	std::ifstream file = readDataset(this->ds_path);
 	std::string line;
@@ -71,7 +71,7 @@ void Graph::set_nodes_edges(const std::string& ds_path) {
     }
 }
 
-// Parses the string line
+// Function that parses the string line.
 std::vector<int> Graph::parseLine(const std::string& line) {
     std::istringstream line_stream(line);
     std::string str;
@@ -83,7 +83,7 @@ std::vector<int> Graph::parseLine(const std::string& line) {
     return pair;
 }
 
-// Updates the minimum and maximum node given a pair of nodes
+// Function that updates the minimum and maximum node given a pair of nodes.
 void Graph::updateMinMaxNodes(const std::vector<int>& pair) {
     if (pair[0] < this->min_node)
         this->min_node = pair[0];
@@ -96,7 +96,7 @@ void Graph::updateMinMaxNodes(const std::vector<int>& pair) {
         this->max_node = pair[1];
 }
 
-// Allocates permanent memory 
+// Function that allocates permanent memory .
 void Graph::allocate_memory() {
     
 	// allocating the right amount of memory
@@ -109,28 +109,25 @@ void Graph::allocate_memory() {
     std::string line;
     int i = 0;
     
-	// ror each line until we pass through all the file
+	// for each line until we pass through all the file
     while (std::getline(file, line)) {
         if (line[0] != '#') {
             std::vector<int> pair = this->parseLine(line);
             this->updateMinMaxNodes(pair);
-            
             this->np_pointer[i] = nodes_pair(pair[0], pair[1]);
-			// std::cout << "DEBUG: " << "i = " << i << "\nnp_pointer = " << pair[0] << " " << pair[1] << "\n";
             i++;
         }
     }
     file.close();
 }
 
-// Frees the permanent memory regarding the graph
+// Function that frees the permanent memory regarding the graph.
 void Graph::freeMemory() {
 	if (munmap(this->np_pointer, this->edges) != 0)
     	throw std::runtime_error("Free memory failed\n");
 }
 
-
-// Function to obtain the top_k nodes of a given algorithm
+// Function that obtains the top_k nodes of a given algorithm.
 void Graph::get_algo_topk_results(std::unordered_map<unsigned int, double> iter, std::vector<unsigned int>& topk, top_k_results& algo_topk) {
 
     std::vector<std::pair<unsigned int, double>> pairs(iter.begin(), iter.end());
@@ -142,8 +139,7 @@ void Graph::get_algo_topk_results(std::unordered_map<unsigned int, double> iter,
 	}
 }
 
-
-// Function to print the top_k nodes of a given algorithm
+// Function that prints the top_k nodes of a given algorithm.
 void Graph::print_algo_topk_results(top_k_results& algo_topk, std::string& algo_str) {
 	for (auto p : algo_topk){
 		std::cout << "Top " << p.first << std::endl;
