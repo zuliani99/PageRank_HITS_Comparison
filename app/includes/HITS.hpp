@@ -248,18 +248,18 @@ void HITS::get_topk_hub() {
 // Function that prints the content of the authority vector.
 void HITS::print_authority(){
 	std::cout << "Values of a_k = [";
-	for (int i = 0; i < this->HITS_authority.size(); i++){
+	for (int i = 0; i < this->HITS_authority.size(); i++)
 		std::cout << HITS_authority[i] << ",";
-	}
+	
 	std::cout << "]\n";
 }
 
 // Function that prints the content of the hub vector.
 void HITS::print_hub(){
 	std::cout << "Values of h_k = [";
-	for (int i = 0; i < this->HITS_hub.size(); i++){
+	for (int i = 0; i < this->HITS_hub.size(); i++)
 		std::cout << HITS_hub[i] << ",";
-	}
+	
 	std::cout << "]\n";
 }
 
