@@ -79,7 +79,7 @@ void PageRank::set_card_map_and_dan_node(){
 	// sorting the sequence of pair of points by the fist element by increasingly oder
 	std::stable_sort(this->graph.np_pointer, this->graph.np_pointer + this->graph.edges, compareByFirstIncreasing);
 
-	unsigned int predecessor = this->graph.np_pointer[0].first;//-1;
+	unsigned int predecessor = this->graph.np_pointer[0].first;
 
 	for (unsigned int i = 0; i < this->graph.edges; i++) {
 		if (predecessor == this->graph.np_pointer[i].first) {
