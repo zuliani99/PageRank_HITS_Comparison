@@ -162,7 +162,7 @@ void HITS::compute(){
         this->steps++;
 
 		// hub score
-    	// h_k = L * a_k-1
+    	// h_k+1 = L * a_k
 
         unsigned int row_ptr = 0;
         unsigned int next_row_ptr = this->row_ptr_nempty_L[row_ptr + 1].first;
@@ -175,7 +175,7 @@ void HITS::compute(){
         }
 
         // authority score
-		// a_k = L^t * h_k-1
+		// a_k+1 = L^t * h_k
 
         row_ptr = 0;
         next_row_ptr = this->row_ptr_nempty_L_t[row_ptr + 1].first;
