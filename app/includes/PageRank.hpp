@@ -11,14 +11,14 @@ class PageRank {
 			
 			for (unsigned int i = 0; i < this->graph.nodes; i++) this->PR_Prestige[i] = 1. / this->graph.nodes;
 
-			// creating the dangling nodes and cardinality map
+			// computing the dangling nodes vectors and cardinality map
 			this->set_card_map_and_dan_node();
 			
-			// creating the transpose matrix
+			// computing the transpose matrix
 			this->set_T_matrix();
 		}
 
-		// Vector that indicates the top_k value that we have to compute.
+		// Vector that indicates the k value for which the top-k ranking is computed.
 		std::vector<unsigned int> top_k; 
 
 		// Vector that store the results for each top_k.
@@ -33,7 +33,7 @@ class PageRank {
 		// Elapsed time.
 		Duration elapsed;
 		
-		// Private functions declaration
+		// Public functions declaration
 
 		void compute();
 		void get_topk_results();
@@ -49,16 +49,15 @@ class PageRank {
 		// Vector that memorizes the ID of dangling nodes.
 		std::vector<unsigned int> dangling_nodes; 
 
-		// String for PageRank.
 		std::string algo_str = "PageRank Prestige"; 
 
 		// Pointer to the transpose matrix.
 		traspose_pair* pt_traspose; 
 
-		// Vector that stores the row pointer and the non empty row ID.
+		// Vector that stores the row pointer and the non empty row pointer.
 		std::vector<std::pair<unsigned int, unsigned int>> row_pointers; 
 
-		// Public functions declaration
+		// Private functions declaration
 
 		void set_card_map_and_dan_node();
 		void add_danglings(unsigned int start, unsigned int end);
@@ -76,7 +75,7 @@ void PageRank::add_danglings(unsigned int start, unsigned int end) {
 void PageRank::set_card_map_and_dan_node(){
 	unsigned int cardinality = 0;
 
-	// sorting the sequence of pair of points by the fist element by increasingly oder
+	// sorting the sequence of pair of points by the fist element by increasingly order
 	std::stable_sort(this->graph.np_pointer, this->graph.np_pointer + this->graph.edges, compareByFirstIncreasing);
 
 	unsigned int predecessor = this->graph.np_pointer[0].first;
@@ -115,14 +114,14 @@ void PageRank::set_T_matrix() {
 	for (unsigned int j = 0; j < this->graph.edges; j++) {
 		if(j == 0 || this->graph.np_pointer[j].second != this->graph.np_pointer[j - 1].second)
 			
-			// adding the row pointer and the non empty row pointer in the vector of pow pointers pairs
+			// adding the row pointer and the non empty row pointer in the vector of row pointers pairs
 			this->row_pointers.push_back(std::make_pair(j, this->graph.np_pointer[j].second - this->graph.min_node));
 
 														// 1/Oi														 col_index
 		this->pt_traspose[j] = traspose_pair(1. / this->cardinality_map[this->graph.np_pointer[j].first], this->graph.np_pointer[j].first);
 	}
 
-	// notifying the conclusion of out transpose matrix
+	// notifying the conclusion of the transpose matrix
 	this->row_pointers.push_back(std::make_pair(this->graph.edges, this->graph.edges)); 
 
 	// freeing the Graph structure since now we will use only the transpose matrix
@@ -135,7 +134,6 @@ void PageRank::compute() {
 	// initializing a temporary PageRank Prestige that will be empty after each do while iteration 
 	std::unordered_map<unsigned int, double> current_PR_Prestige;
 
-	// 1. / this->graph.nodes;
 	for (unsigned int i = 0; i < this->graph.nodes; i++) current_PR_Prestige[i] = 0.;
 
 	auto start = now();
@@ -153,13 +151,13 @@ void PageRank::compute() {
 		// computing the A^t * P_k
 		for(unsigned int i = 0; i < this->graph.edges; i++) {
 			
-			// control to permit to update the same node until we change matrix row
+			// control if we can update the same node until change matrix row change
 			if(i == next_row_ptr){
 				row_ptr++;
 				next_row_ptr = this->row_pointers[row_ptr + 1].first;
 			}
 
-			// here is done the actual matrix moltiplication between the transpose matrix #edges x #edges times the PR column vector #edges x 1
+			// here is done the actual matrix moltiplication between the transpose matrix (#edges x #edges) times the PR column vector (#edges x 1)
 			// so the summation between all the moltiplication of the elements of a given row and the element of the column vector
 			current_PR_Prestige[this->row_pointers[row_ptr].second] += this->pt_traspose[i].first * this->PR_Prestige[this->pt_traspose[i].second - this->graph.min_node];
 		}
@@ -187,7 +185,6 @@ bool PageRank::converge(std::unordered_map<unsigned int, double> &temp_Pk) {
 	// emptying the temporary vector
 	temp_Pk.clear();
 
-	//1. / this->graph.nodes;
 	for (unsigned int i = 0; i < this->graph.nodes; i++) temp_Pk[i] = 0.;
 
 	// verify the convergence

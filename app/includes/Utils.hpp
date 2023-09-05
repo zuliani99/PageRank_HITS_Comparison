@@ -20,11 +20,10 @@ using card_map = std::unordered_map<unsigned int, unsigned int>;
 // Typedef for the transpose matrix (used for the sparse matrix representation): (value, from_node_id).
 using traspose_pair = std::pair<double, unsigned int>;
 
-// Typedef for the top-k results of each algorithm, for all the values of k.
+// Typedef for the top_k results of each algorithm, for all the values of k.
 using top_k_results = std::unordered_map<unsigned int, std::vector<std::pair<unsigned int, double>>>;
 
 // Time execution statements
-
 static auto now = std::chrono::high_resolution_clock::now;
 using Duration = std::chrono::duration<double, std::milli>;
 
@@ -38,7 +37,7 @@ bool compareBySecondIncreasing(const nodes_pair& pair1, const nodes_pair& pair2)
     return pair1.second < pair2.second;
 }
 
-// Function that compares the second element of a node pair in decreasiong order.
+// Function that compares the second element of a node pair in decreasing order.
 bool compareBySecondDecreasing(const std::pair<unsigned int, double>& pair1, const std::pair<unsigned int, double>& pair2) {
     return pair1.second > pair2.second;
 }

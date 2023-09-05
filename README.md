@@ -25,7 +25,7 @@ The *.exe* file will be inserted into the */app/bin* directory.
 ## Usage
 After typed *./app* in the */app/bin* directory thw following message will be displayed:
 ```
-Do you want to activate VERBOSE mode to see the top_k nodes fro each k and algorithms? (0/1)
+Do you want to activate VERBOSE mode to see the top_k nodes for each k and algorithms? (0/1)
 ```
 In case you choose wanto to see the *top_k* nodes for all top k values and for all algorithm insert 1, optherwise 0. After having pressed enter with the respective choiche the application execution will starts.
 
@@ -34,7 +34,7 @@ In case you choose wanto to see the *top_k* nodes for all top k values and for a
 ```
 ------------------------------------- PageRank - HITS - InDegree Comparison ------------------------------------
 
-Do you want to activate VERBOSE mode to see the top_k nodes fro each k and algorithms? (0/1) 0
+Do you want to activate VERBOSE mode to see the top_k nodes for each k and algorithms? (0/1) 0
 
 -------------------web-NotreDame.txt---------------------
 IN_DEGREE

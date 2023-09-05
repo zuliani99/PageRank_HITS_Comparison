@@ -11,7 +11,7 @@ int main(){
 	bool verbose;
 
 	std::cout << "------------------------------------- PageRank - HITS - InDegree Comparison ------------------------------------- \n\n";
-	std::cout << "Do you want to activate VERBOSE mode to see the top_k nodes fro each k and algorithms? (0/1) ";
+	std::cout << "Do you want to activate VERBOSE mode to see the top_k nodes for each k and algorithms? (0/1) ";
 	std::cin >> verbose;
 
 	if (verbose != 0 && verbose != 1) throw std::invalid_argument("Please insert a correct input");
@@ -19,6 +19,9 @@ int main(){
 	std::vector<std::string> datasets = {"web-BerkStan.txt", "web-Google.txt", "web-NotreDame.txt", "web-Stanford.txt"};
 	
 	std::vector<unsigned int> top_k; 
+
+
+	// Fstream .csv file creation
 
 	const auto p1 = std::chrono::system_clock::now();
 	std::time_t today_time = std::chrono::system_clock::to_time_t(p1);
@@ -46,6 +49,7 @@ int main(){
 
 	for (std::string ds : datasets) {
 
+		// Fill the vector of top_k value  
 		top_k.clear();
 		for (unsigned int i = 0; i<19; i++) top_k.push_back(std::pow(2,i));
 
@@ -88,6 +92,7 @@ int main(){
 		hits.free_matrices_memory();
 		std::cout << std::endl;
 
+		// Jaccard Coefficient
 		JaccardCoefficient jaccard = JaccardCoefficient(top_k, in_degree.IN_topk, page_rank.PR_topk, hits.authority_topk, hits.hub_topk);
 		jaccard.obtain_results();
 		if(verbose) jaccard.print_results();

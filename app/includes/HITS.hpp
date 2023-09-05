@@ -11,7 +11,7 @@ class HITS {
 			this->initialize_ak_hk();
 		}
 
-		// Vector containing the values of k for which the top-k is computed.
+		// Vector that indicates the k value for which the top-k ranking is computed.
 		std::vector<unsigned int> top_k;
 
 		// Map: NodeID <-> authority score at time k.
@@ -32,7 +32,7 @@ class HITS {
 		// Elapsed time for computation.
 		Duration elapsed;
 
-		// Public functions declaration
+		// Public functions declaration.
 		
 		void compute_L();
 		void compute_L_t();
@@ -55,17 +55,16 @@ class HITS {
 		// Pointer to the destination nodes of the adjacency matrix L.
     	unsigned int* L_ptr;
 
-		std::vector<std::pair<unsigned int, unsigned int>> row_ptr_nempty_L;
+		// Vector of row pointer pairs for the adjacency matrix L.
+		std::vector<std::pair<unsigned int, unsigned int>> row_ptr_enempty_L;
 
 		// Pointer to the destination nodes of the transpose od the adjacency matrix L, L_t.
     	unsigned int* L_t_ptr;
 
-		std::vector<std::pair<unsigned int, unsigned int>> row_ptr_nempty_L_t;
+		// Vector of row pointer pairs for the adjacency matrix L_t.
+		std::vector<std::pair<unsigned int, unsigned int>> row_ptr_enempty_L_t;
 		
-		// String for authority.
 		std::string autority_str = "Authority"; 
-
-		// String for hub.
 		std::string hub_str = "Hub"; 
 
 		// Private functions declaration
@@ -84,18 +83,18 @@ void HITS::compute_L(){
 	if (L_ptr == MAP_FAILED)
 		throw std::runtime_error("Mapping failed\n");
 	
-	// computing L, the adjacency matrix
+	// computing L and the adjacency matrix
 	for (unsigned int i = 0; i < this->graph.edges; i++){
 		if(i == 0 || this->graph.np_pointer[i - 1].first != this->graph.np_pointer[i].first)
 
 			// adding the row pointer and the non empty row pointer in the vector of pow pointers pairs
-			this->row_ptr_nempty_L.push_back(std::make_pair(i, this->graph.np_pointer[i].first - this->graph.min_node));
+			this->row_ptr_enempty_L.push_back(std::make_pair(i, this->graph.np_pointer[i].first - this->graph.min_node));
 
 		this->L_ptr[i] = this->graph.np_pointer[i].second;
 	}
 
 	// notifying the conclusion 
-	this->row_ptr_nempty_L.push_back(std::make_pair(this->graph.edges, this->graph.edges)); 
+	this->row_ptr_enempty_L.push_back(std::make_pair(this->graph.edges, this->graph.edges)); 
 }
 
 // Function that computes the transpose matrix of the adjacency matrix L, L_t.
@@ -108,18 +107,18 @@ void HITS::compute_L_t(){
 	if (L_t_ptr == MAP_FAILED)
 		throw std::runtime_error("Mapping failed\n");
 		
-	// computing L_t, the transpose of the adjacency matrix
+	// computing L_t and the transpose of the adjacency matrix
 	for (unsigned int i = 0; i < this->graph.edges; i++){
 		if(i == 0 || this->graph.np_pointer[i - 1].second != this->graph.np_pointer[i].second)
 
 			// adding the row pointer and the non empty row pointer in the vector of pow pointers pairs
-			this->row_ptr_nempty_L_t.push_back(std::make_pair(i, this->graph.np_pointer[i].second - this->graph.min_node));
+			this->row_ptr_enempty_L_t.push_back(std::make_pair(i, this->graph.np_pointer[i].second - this->graph.min_node));
 
 		this->L_t_ptr[i] = this->graph.np_pointer[i].first;
 	}
 
 	// notifying the conclusion 
-	this->row_ptr_nempty_L_t.push_back(std::make_pair(this->graph.edges, this->graph.edges));
+	this->row_ptr_enempty_L_t.push_back(std::make_pair(this->graph.edges, this->graph.edges));
 }
 
 // Function that creates L and L_t and that performs the two matrix multiplications.
@@ -165,26 +164,30 @@ void HITS::compute(){
     	// h_k+1 = L * a_k
 
         unsigned int row_ptr = 0;
-        unsigned int next_row_ptr = this->row_ptr_nempty_L[row_ptr + 1].first;
+        unsigned int next_row_ptr = this->row_ptr_enempty_L[row_ptr + 1].first;
         for (unsigned int i = 0; i < this->graph.edges; i++){
+
+			// control if we can update the same node until change matrix row change
             if (i == next_row_ptr){
                 row_ptr++;
-                next_row_ptr = this->row_ptr_nempty_L[row_ptr + 1].first;
+                next_row_ptr = this->row_ptr_enempty_L[row_ptr + 1].first;
             }
-			temp_HITS_hub[this->row_ptr_nempty_L[row_ptr].second] += 1 * this->HITS_authority[this->L_ptr[i]];
+			temp_HITS_hub[this->row_ptr_enempty_L[row_ptr].second] += 1 * this->HITS_authority[this->L_ptr[i]];
         }
 
         // authority score
 		// a_k+1 = L^t * h_k
 
         row_ptr = 0;
-        next_row_ptr = this->row_ptr_nempty_L_t[row_ptr + 1].first;
+        next_row_ptr = this->row_ptr_enempty_L_t[row_ptr + 1].first;
         for (unsigned int i = 0; i < this->graph.edges; i++){
+
+			// control if we can update the same node until change matrix row change
             if (i == next_row_ptr){
                 row_ptr++;
-                next_row_ptr = this->row_ptr_nempty_L_t[row_ptr + 1].first;
+                next_row_ptr = this->row_ptr_enempty_L_t[row_ptr + 1].first;
             }
-			temp_HITS_authority[this->row_ptr_nempty_L_t[row_ptr].second] += 1 * this->HITS_hub[this->L_t_ptr[i]];
+			temp_HITS_authority[this->row_ptr_enempty_L_t[row_ptr].second] += 1 * this->HITS_hub[this->L_t_ptr[i]];
 		}
 
         this->normalize(temp_HITS_authority, temp_HITS_hub);		

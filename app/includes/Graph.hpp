@@ -8,7 +8,7 @@
 #include <cmath>
 
 
-// Class that describes the general behaviour that a graph has, with relative generic functions.
+// Class that describes the general behaviour of a graph.
 class Graph {
 	public:
 		// Default constructor.
@@ -96,7 +96,7 @@ void Graph::updateMinMaxNodes(const std::vector<int>& pair) {
         this->max_node = pair[1];
 }
 
-// Function that allocates permanent memory .
+// Function that allocates permanent memory.
 void Graph::allocate_memory() {
     
 	// allocating the right amount of memory
@@ -109,8 +109,10 @@ void Graph::allocate_memory() {
     std::string line;
     int i = 0;
     
-	// for each line until we pass through all the file
+	// for each line until we read the entire file
     while (std::getline(file, line)) {
+
+		// excluding the description part
         if (line[0] != '#') {
             std::vector<int> pair = this->parseLine(line);
             this->updateMinMaxNodes(pair);
@@ -118,6 +120,7 @@ void Graph::allocate_memory() {
             i++;
         }
     }
+	
     file.close();
 }
 

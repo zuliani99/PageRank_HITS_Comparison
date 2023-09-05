@@ -10,7 +10,7 @@ class JaccardCoefficient {
 		JaccardCoefficient(std::vector<unsigned int> topk, top_k_results &ID_topk, top_k_results &PR_topk, top_k_results &HITS_authority_topk, top_k_results &HITS_hub_topk) {
 			this->topk = topk;
 
-			// retrieving the IDs of the top_k nodes for each top_k results for all the algorithms
+			// retrieving the IDs of the top-k nodes for each top-k results for all the algorithms
 			this->nodes_ID_topk = this->get_first_element_vector(ID_topk);
 			this->nodes_PR_topk = this->get_first_element_vector(PR_topk);
 			this->nodes_HITS_authority_topk = this->get_first_element_vector(HITS_authority_topk);
@@ -40,7 +40,7 @@ class JaccardCoefficient {
 		double jaccard_coefficient(std::vector<unsigned int> &v1, std::vector<unsigned int> &v2);
 };
 
-// Function that retrieves the IDs of the top_k nodes for each top_k results.
+// Function that retrieves the IDs of the top-k nodes for each top-k results.
 std::map<unsigned int, std::vector<unsigned int>> JaccardCoefficient::get_first_element_vector(top_k_results &topk_vector) {
 
 	// for each value of k, we store the IDs of the top-k nodes
@@ -56,7 +56,7 @@ std::map<unsigned int, std::vector<unsigned int>> JaccardCoefficient::get_first_
 							return pair.first;
 						});
 
-		// setting the array on the k unordered map position
+		// setting the array on the unordered map at k
 		jaccard_results[k] = firstElements; 
 	}
 	return jaccard_results;
