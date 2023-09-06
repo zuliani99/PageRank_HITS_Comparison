@@ -20,7 +20,7 @@ using card_map = std::unordered_map<unsigned int, unsigned int>;
 // Typedef for the transpose matrix (used for the sparse matrix representation): (value, from_node_id).
 using traspose_pair = std::pair<double, unsigned int>;
 
-// Typedef for the top_k results of each algorithm, for all the values of k.
+// Typedef for the top-k results of each algorithm, for all the values of k.
 using top_k_results = std::unordered_map<unsigned int, std::vector<std::pair<unsigned int, double>>>;
 
 // Time execution statements

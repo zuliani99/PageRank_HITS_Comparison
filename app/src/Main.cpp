@@ -11,7 +11,7 @@ int main(){
 	bool verbose;
 
 	std::cout << "------------------------------------- PageRank - HITS - InDegree Comparison ------------------------------------- \n\n";
-	std::cout << "Do you want to activate VERBOSE mode to see the top_k nodes for each k and algorithms? (0/1) ";
+	std::cout << "Do you want to activate VERBOSE mode to see the top-k nodes for each k and algorithms? (0/1) ";
 	std::cin >> verbose;
 
 	if (verbose != 0 && verbose != 1) throw std::invalid_argument("Please insert a correct input");
