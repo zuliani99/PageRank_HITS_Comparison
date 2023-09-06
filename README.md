@@ -1,5 +1,5 @@
-# PageRank_HITS_Comparison
-The aim of this project is to compare the prestige computation of a given pages graph using an implementation of PageRank and HITS
+# PageRank_HITS_InDegree_Comparison
+The aim of this project is to compare the prestige computation of a given pages graph using an implementation of PageRank, HITS and InDegree
 
 ## Startup
 In order to run the benchmark you have to run these command in your console:
