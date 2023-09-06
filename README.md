@@ -27,7 +27,7 @@ After typed *./app* in the */app/bin* directory thw following message will be di
 ```
 Do you want to activate VERBOSE mode to see the top_k nodes for each k and algorithms? (0/1)
 ```
-In case you want to see the *top_k* nodes for all top k values and for all algorithms insert 1, otherwise 0. After having pressed enter with the respective choice the application execution will start.
+In case you want to see the *top-k* nodes for all *top-k* values and for all algorithms insert 1, otherwise 0. After having pressed enter with the respective choice the application execution will start.
 
 
 ## Example of Console Output with Verbose mode OFF
