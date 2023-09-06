@@ -1,5 +1,5 @@
 # PageRank_HITS_InDegree_Comparison
-The aim of this project is to compare the prestige computation of a given pages graph using an implementation of PageRank, HITS and InDegree
+The aim of this project is to compare the prestige computation of a given pages graph using an implementation of PageRank, HITS and InDegree.
 
 ## Startup
 In order to run the benchmark you have to run these command in your console:
@@ -15,7 +15,7 @@ After that, to compile the project, you have to jump into the */app/src* folder 
 g++ -std=c++2a -o ../bin/app Main.cpp
 ```
 
-For compier optimization instead type:
+For compiler optimization instead type:
 ```
 g++ -std=c++2a -O3 -o ../bin/app Main.cpp
 ```
@@ -27,14 +27,14 @@ After typed *./app* in the */app/bin* directory thw following message will be di
 ```
 Do you want to activate VERBOSE mode to see the top_k nodes for each k and algorithms? (0/1)
 ```
-In case you choose wanto to see the *top_k* nodes for all top k values and for all algorithm insert 1, optherwise 0. After having pressed enter with the respective choiche the application execution will starts.
+In case you want to see the *top_k* nodes for all top k values and for all algorithms insert 1, otherwise 0. After having pressed enter with the respective choice the application execution will start.
 
 
 ## Example of Console Output with Verbose mode OFF
 ```
 ------------------------------------- PageRank - HITS - InDegree Comparison ------------------------------------
 
-Do you want to activate VERBOSE mode to see the top_k nodes for each k and algorithms? (0/1) 0
+Do you want to activate VERBOSE mode to see the top-k nodes for each k and algorithms? (0/1) 0
 
 -------------------web-NotreDame.txt---------------------
 IN_DEGREE
