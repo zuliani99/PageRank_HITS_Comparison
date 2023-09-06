@@ -23,7 +23,7 @@ g++ -std=c++2a -O3 -o ../bin/app Main.cpp
 The *.exe* file will be inserted into the */app/bin* directory.
 
 ## Dataset
-The used datasets are from the [https://snap.stanford.edu/data/#web](Stanford Large Network Dataset Collection). Download, extract the *.txt* file and place it in the */app/dataset* folder. 
+The used datasets are from the [Stanford Large Network Dataset Collection](https://snap.stanford.edu/data/#web). Download, extract the exch *.txt* file and place it in the */app/dataset* folder. 
 
 ## Usage
 After typed *./app* in the */app/bin* directory thw following message will be displayed:
