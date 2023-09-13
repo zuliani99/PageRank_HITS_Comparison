@@ -42,16 +42,6 @@ bool compareBySecondDecreasing(const std::pair<unsigned int, double>& pair1, con
     return pair1.second > pair2.second;
 }
 
-// Function that returns the std::vector of dataset contained in the given directory path.
-std::vector<std::string> getDatasetsTXT(const std::string& directoryPath) {
-    std::vector<std::string> txtFileList;
-    for (const auto& entry : std::filesystem::directory_iterator(directoryPath))
-        if (entry.is_regular_file() && entry.path().extension() == ".txt")
-            txtFileList.push_back(entry.path().string());
-
-    return txtFileList;
-}
-
 // Function that returns the stream istance of a given dataset path.
 std::ifstream readDataset(const std::string& filepath) {
     std::ifstream file;
